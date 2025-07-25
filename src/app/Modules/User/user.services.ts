@@ -1,4 +1,3 @@
-import httpStatus from 'http-status-codes';
 import { IAuthprovider, IUser } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";

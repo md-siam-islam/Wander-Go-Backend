@@ -1,6 +1,7 @@
 import { IUser } from "../User/user.interface";
 import { User } from "../User/user.model";
 import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 
 const CredentialLogin = async (payload : Partial<IUser>) => {
@@ -18,11 +19,19 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
     if (!isMatch) {
         throw new Error("Invalid credentials");
     }
-
-    return {
+    const JWT_payload = {
         userId: user._id,
         email: user.email,
+        role : user.role,
         auth: user.auth
+    }
+
+    const accessToken = jwt.sign(JWT_payload, "secret", {
+        expiresIn: "1h"
+    });
+
+    return {
+       accessToken
     };
 }
 
