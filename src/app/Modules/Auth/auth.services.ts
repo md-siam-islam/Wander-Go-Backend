@@ -2,6 +2,7 @@ import { IUser } from "../User/user.interface";
 import { User } from "../User/user.model";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { createToken } from "../utils/jwt";
 
 
 const CredentialLogin = async (payload : Partial<IUser>) => {
@@ -26,9 +27,12 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
         auth: user.auth
     }
 
-    const accessToken = jwt.sign(JWT_payload, "secret", {
-        expiresIn: "1h"
-    });
+    const accessToken = createToken(JWT_payload, "secret", "1d")
+
+
+    // const accessToken = jwt.sign(JWT_payload, "secret", {
+    //     expiresIn: "1h"
+    // });
 
     return {
        accessToken
