@@ -1,6 +1,7 @@
 import {Server} from "http"
 import mongoose from "mongoose";
 import app from "./app";
+import { seedSuperAdmin } from "./app/Modules/utils/seedSuperAdmin";
 
 let server : Server ;
 const PORT = process.env.PORT || 5000;
@@ -17,7 +18,10 @@ async function StartServer() {
     }
 }  
 
-StartServer()
+(async () => {
+    await StartServer();
+    await seedSuperAdmin();
+})();
 
 process.on("SIGTERM" , () => {
     console.log("Server shout down");
