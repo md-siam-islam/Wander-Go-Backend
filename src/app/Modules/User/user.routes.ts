@@ -3,8 +3,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import { UserController } from './user.controller';
 import { createUserZoodSchema } from './user.validate';
 import { validateUser } from '../../../MIddleware/validate.user';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import { verifyToken } from '../utils/jwt';
 import { checkAuth } from '../../../MIddleware/checkAuth';
 
 const router = express.Router()

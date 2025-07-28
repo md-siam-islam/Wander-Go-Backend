@@ -1,12 +1,12 @@
 import  bcryptjs  from 'bcryptjs';
 import { User } from "../User/user.model"
 import { IAuthprovider, IUser, Role } from '../User/user.interface';
-import { object } from 'zod/v3/external.cjs';
 
 export const seedSuperAdmin = async () => {
 
    try {
    const SuperAdminEmail = "admin@example.com"
+   const SuperAdminPassword = "SuperAdminPassword123"
 
    const Admin = await User.findOne({email:SuperAdminEmail})
 
@@ -15,7 +15,7 @@ export const seedSuperAdmin = async () => {
        return
    }
 
-   const superAdminPassword = await bcryptjs.hash("SuperAdminPassword123", 10);
+   const superAdminPassword = await bcryptjs.hash(SuperAdminPassword, 10);
 
    const authProvider: IAuthprovider = {
          Provider: "Credential",

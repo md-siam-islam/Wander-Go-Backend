@@ -29,11 +29,6 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
 
     const accessToken = createToken(JWT_payload, "secret", "1d")
 
-
-    // const accessToken = jwt.sign(JWT_payload, "secret", {
-    //     expiresIn: "1h"
-    // });
-
     return {
        accessToken
     };

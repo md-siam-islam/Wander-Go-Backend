@@ -31,16 +31,19 @@ import z, { object } from "zod";
 
     })
 
-    
- export const updateUserZoodSchema = z.object({
+export const updateUserZoodSchema = z.object({
 name: z
     .string({ invalid_type_error: "Name must be a string" })
     .min(2, { message: "Name must be at least 2 characters" })
     .max(50, { message: "Name must be at most 50 characters" }).optional(),
 
-  phone: z
+phone: z
     .string()
+    .regex(/^(\+8801|8801|01)[3-9]\d{8}$/, {
+    message: "Phone number must be a valid Bangladeshi number",
+  })
     .optional(),
+    
     password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" })
