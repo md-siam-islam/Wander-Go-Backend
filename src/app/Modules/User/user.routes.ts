@@ -1,5 +1,5 @@
 import { Role } from './user.interface';
-import express, { NextFunction, Request, Response } from 'express';
+import express from 'express';
 import { UserController } from './user.controller';
 import { createUserZoodSchema } from './user.validate';
 import { validateUser } from '../../../MIddleware/validate.user';
@@ -11,5 +11,6 @@ const router = express.Router()
 
 router.post('/register',validateUser(createUserZoodSchema),UserController.CreateUser)
 router.get("/all-users" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.AllUser )
+router.patch('/:id', checkAuth(...Object.values(Role)), UserController.UpdateUser)
 
 export const UserRoutes = router
