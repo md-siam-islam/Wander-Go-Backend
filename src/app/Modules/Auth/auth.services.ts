@@ -14,7 +14,6 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
     if (!user) {
         throw new Error("User not found");
     }
-
     // Check password
     const isMatch = await bcryptjs.compare(password as string, user.password as string);
 
@@ -28,10 +27,16 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
         auth: user.auth
     }
 
-    const accessToken = createToken(JWT_payload, "secret", envVariables.JWT_ACCESS_TOKEN_EXPIRE)
+    const accessToken = createToken(JWT_payload, envVariables.JWT_SECRET, envVariables.JWT_ACCESS_TOKEN_EXPIRE)
+
+    const refreshToken = createToken(JWT_payload , envVariables.JWT_REFRESH_SECRET, envVariables.JWT_REFRESH_TOKEN_EXPIRE)
+
+    const {password: pas , ...rest} = user
 
     return {
-       accessToken
+       accessToken,
+       refreshToken,
+       rest
     };
 }
 
