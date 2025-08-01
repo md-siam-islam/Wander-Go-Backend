@@ -21,16 +21,6 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
     if (!isMatch) {
         throw new Error("Invalid credentials");
     }
-    // const JWT_payload = {
-    //     userId: user._id,
-    //     email: user.email,
-    //     role : user.role,
-    //     auth: user.auth
-    // }
-
-    // const accessToken = createToken(JWT_payload, envVariables.JWT_SECRET, envVariables.JWT_ACCESS_TOKEN_EXPIRE)
-
-    // const refreshToken = createToken(JWT_payload , envVariables.JWT_REFRESH_SECRET, envVariables.JWT_REFRESH_TOKEN_EXPIRE)
 
     const userAssesToken = JwtAccessToken(user)
 
@@ -45,7 +35,7 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
 
 const generateRefreshToken = async (refreshToken: string) => {
 
-    const tokenInfo = jwt.verify(refreshToken, envVariables.JWT_REFRESH_SECRET) as JwtPayload;
+    const tokenInfo =  jwt.verify(refreshToken, envVariables.JWT_REFRESH_SECRET) as JwtPayload;
     
     if (!tokenInfo) {
         throw new Error("Refresh token is required");
@@ -66,9 +56,6 @@ const generateRefreshToken = async (refreshToken: string) => {
     if(isUser.isDeleted){
         throw new Error("User is not active");
     }
-
-
-
 
     const JWT_payload = {
         userId: isUser._id,

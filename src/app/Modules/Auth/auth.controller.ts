@@ -3,20 +3,13 @@ import { catchAsync } from "../utils/catchAsync"
 import { AuthServices } from "./auth.services"
 import { Sendresponse } from "../utils/sendResponse"
 import httpStatus from "http-status-codes"
+import { setCookiesAccessTokenwithRefreshToken } from "../utils/setCookies"
 
 
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await AuthServices.CredentialLogin(req.body)
 
-    res.cookie('accessToken', user.accessToken, {
-        httpOnly: true,
-        secure: false, // Set to true if using HTTPS
-    })
-    // Set the refresh token in a cookie
-    res.cookie('refreshToken', user.refreshToken, {
-        httpOnly: true,
-        secure: false, // Set to true if using HTTPS
-    })
+    setCookiesAccessTokenwithRefreshToken(res,user)
 
     Sendresponse(res, {
         success: true,
@@ -25,18 +18,22 @@ const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
         data: user
     })
 })
+
 const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    // const refreshToken = req.headers.authorization
-    const refreshToken = req.cookies.refreshToken
-    const tokenInfo = await AuthServices.generateRefreshToken(refreshToken as string)
+    const refreshToken = req.cookies.refreshToken;
+
+    const tokenInfo = await AuthServices.generateRefreshToken(refreshToken as string);
+
+    setCookiesAccessTokenwithRefreshToken(res, tokenInfo);
 
     Sendresponse(res, {
         success: true,
         statuscode: httpStatus.OK,
         message: "User Login Successfull",
         data: tokenInfo
-    })
-})
+    });
+});
+
 
 export const AuthController = {
     LoginUser,
