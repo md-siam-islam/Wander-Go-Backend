@@ -15,7 +15,20 @@ const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
         data: user
     })
 })
+const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    // const refreshToken = req.headers.authorization 
+    const refreshToken = req.cookies.refreshToken
+    const tokenInfo = await AuthServices.generateRefreshToken(refreshToken as string)
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "User Login Successfull",
+        data: tokenInfo
+    })
+})
 
 export const AuthController = {
-    LoginUser
+    LoginUser,
+    RefreshToken
 }
