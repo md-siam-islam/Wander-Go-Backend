@@ -7,6 +7,12 @@ import httpStatus from "http-status-codes"
 
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await AuthServices.CredentialLogin(req.body)
+
+    res.cookie('accessToken', user.accessToken, {
+        httpOnly: true,
+        secure: false, // Set to true if using HTTPS
+    })
+    // Set the refresh token in a cookie
     res.cookie('refreshToken', user.refreshToken, {
         httpOnly: true,
         secure: false, // Set to true if using HTTPS
