@@ -16,8 +16,8 @@ const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
     })
 })
 const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    // const refreshToken = req.headers.authorization 
-    const refreshToken = req.cookies.refreshToken
+    const refreshToken = req.headers.authorization 
+    // const refreshToken = req.cookies.refreshToken
     const tokenInfo = await AuthServices.generateRefreshToken(refreshToken as string)
 
     Sendresponse(res, {
