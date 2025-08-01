@@ -3,6 +3,7 @@ import { User } from "../User/user.model";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { createToken } from "../utils/jwt";
+import { envVariables } from "../../config/env";
 
 
 const CredentialLogin = async (payload : Partial<IUser>) => {
@@ -27,7 +28,7 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
         auth: user.auth
     }
 
-    const accessToken = createToken(JWT_payload, "secret", "1d")
+    const accessToken = createToken(JWT_payload, "secret", envVariables.JWT_ACCESS_TOKEN_EXPIRE)
 
     return {
        accessToken

@@ -3,6 +3,7 @@ import { Jwt, JwtPayload } from "jsonwebtoken";
 import { IAuthprovider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
 import bcryptjs from "bcryptjs";
+import { envVariables } from "../../config/env";
 
 const Createuser = async (payload: Partial<IUser>) => {
 
@@ -14,7 +15,7 @@ const Createuser = async (payload: Partial<IUser>) => {
         throw new Error("User already exists");
     }
 
-    const hashedPassword = await bcryptjs.hash(password as string , 10)
+    const hashedPassword = await bcryptjs.hash(password as string , envVariables.BCRYPT_SALT_ROUNDS)
     console.log(hashedPassword)
 
     // const isExixt = await bcrypt.compare(password as string , hashedPassword)
