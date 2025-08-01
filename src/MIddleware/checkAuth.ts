@@ -11,10 +11,12 @@ export const checkAuth =(...role : string[]) => async(req:Request , res:Response
         }
 
         const verify = verifyToken(accessToken , "secret") as JwtPayload;
-
+        
         if(!role.includes(verify.role)) {
-           throw new Error("You are not authorized to access this resource");
+            throw new Error("You are not authorized to access this resource");
         }
+        
+        req.user = verify
         next();
 
     } catch (error) {
