@@ -7,6 +7,10 @@ import httpStatus from "http-status-codes"
 
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = await AuthServices.CredentialLogin(req.body)
+    res.cookie('refreshToken', user.refreshToken, {
+        httpOnly: true,
+        secure: false, // Set to true if using HTTPS
+    })
 
     Sendresponse(res, {
         success: true,
@@ -16,8 +20,8 @@ const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunct
     })
 })
 const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const refreshToken = req.headers.authorization 
-    // const refreshToken = req.cookies.refreshToken
+    // const refreshToken = req.headers.authorization
+    const refreshToken = req.cookies.refreshToken
     const tokenInfo = await AuthServices.generateRefreshToken(refreshToken as string)
 
     Sendresponse(res, {
