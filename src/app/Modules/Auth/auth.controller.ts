@@ -29,13 +29,34 @@ const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
     Sendresponse(res, {
         success: true,
         statuscode: httpStatus.OK,
-        message: "User Login Successfull",
+        message: "New access token retrieve Successfull",
         data: tokenInfo
+    });
+});
+const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    
+    res.clearCookie("accessToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax"
+    });
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "User Logout Successfull",
+        data: null
     });
 });
 
 
 export const AuthController = {
     LoginUser,
-    RefreshToken
+    RefreshToken,
+    LogoutUser
 }

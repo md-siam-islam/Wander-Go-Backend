@@ -10,7 +10,7 @@ export const JwtAccessToken = (user : Partial<IUser>) => {
             email: user.email,
             role : user.role,
             auth: user.auth
-        }
+     }
     
         const accessToken = createToken(JWT_payload, envVariables.JWT_SECRET, envVariables.JWT_ACCESS_TOKEN_EXPIRE)
     
