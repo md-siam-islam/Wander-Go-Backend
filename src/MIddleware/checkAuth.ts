@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { verifyToken } from "../app/Modules/utils/jwt";
+import { envVariables } from "../app/config/env";
+import { User } from "../app/Modules/User/user.model";
+import { IsActive } from "../app/Modules/User/user.interface";
 
 export const checkAuth =(...role : string[]) => async(req:Request , res:Response, next:NextFunction) =>{
     try {
@@ -10,8 +13,24 @@ export const checkAuth =(...role : string[]) => async(req:Request , res:Response
             throw new Error("No token provided");
         }
 
-        const verify = verifyToken(accessToken , "secret") as JwtPayload;
+        const verify = verifyToken(accessToken , envVariables.JWT_SECRET) as JwtPayload;
+
+         const isUser = await User.findOne({ email : verify.email });
+
+            if (!isUser) {
+                throw new Error("User not found");
+            }
         
+            if(isUser.isActive === IsActive.BLOCKED) {
+                throw new Error("User is not active");
+            }
+            if(isUser.isActive === IsActive.INACTIVE) {
+                throw new Error("User is not active");
+            }
+            if(isUser.isDeleted){
+                throw new Error("User is not active");
+            }
+
         if(!role.includes(verify.role)) {
             throw new Error("You are not authorized to access this resource");
         }

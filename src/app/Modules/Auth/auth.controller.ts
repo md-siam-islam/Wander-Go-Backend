@@ -1,9 +1,11 @@
+import { User } from './../User/user.model';
 import { NextFunction, Request, Response } from "express"
 import { catchAsync } from "../utils/catchAsync"
 import { AuthServices } from "./auth.services"
 import { Sendresponse } from "../utils/sendResponse"
 import httpStatus from "http-status-codes"
 import { setCookiesAccessTokenwithRefreshToken } from "../utils/setCookies"
+import { JwtPayload } from 'jsonwebtoken';
 
 
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -33,6 +35,7 @@ const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
         data: tokenInfo
     });
 });
+
 const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     
     res.clearCookie("accessToken", {
@@ -55,8 +58,35 @@ const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 });
 
 
+const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+        const oldPassword = req.body.oldPassword;
+        const newPassword = req.body.newPassword;
+
+    console.log(oldPassword, newPassword);
+
+    if (!oldPassword || !newPassword) {
+        return next(new Error("Old password and new password are required"));
+    }
+    const decodedUser = req.user;
+
+    
+
+    await AuthServices.UserResetPassword( oldPassword,newPassword,decodedUser);
+
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "User Reset Password Successfull",
+        data: null
+    });
+});
+
+
 export const AuthController = {
     LoginUser,
     RefreshToken,
-    LogoutUser
+    LogoutUser,
+    ResetPassword
 }

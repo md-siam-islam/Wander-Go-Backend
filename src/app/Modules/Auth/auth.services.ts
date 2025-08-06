@@ -71,7 +71,33 @@ const generateRefreshToken = async (refreshToken: string) => {
     }; 
 }
 
+
+const UserResetPassword = async (oldPassword: string, newPassword: string, decodedUser: JwtPayload) => {
+
+    const user = await User.findById(decodedUser.userId);
+
+    if (!user) {
+        throw new Error("User not found 80");
+    }
+
+    const isMatch = await bcryptjs.compare(oldPassword, user.password as string);
+
+    if (!isMatch) {
+        throw new Error("Old password is incorrect");
+    }
+
+    user.password = await bcryptjs.hash(newPassword, Number(envVariables.BCRYPT_SALT_ROUNDS));
+    
+    await user.save();
+
+   return {
+       success: true,
+       message: "Password reset successful"
+   };
+}
+
 export const AuthServices = {
     CredentialLogin,
-    generateRefreshToken
+    generateRefreshToken,
+    UserResetPassword
 };
