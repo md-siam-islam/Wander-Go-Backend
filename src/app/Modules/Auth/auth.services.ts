@@ -13,7 +13,7 @@ const CredentialLogin = async (payload : Partial<IUser>) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-        throw new Error("User not found");
+        throw new Error("User not found from CredentialLogin");
     }
     // Check password
     const isMatch = await bcryptjs.compare(password as string, user.password as string);
@@ -44,7 +44,7 @@ const generateRefreshToken = async (refreshToken: string) => {
     const isUser = await User.findOne({ email : tokenInfo.email });
 
     if (!isUser) {
-        throw new Error("User not found");
+        throw new Error("User not found from generateRefreshToken");
     }
 
     if(isUser.isActive === IsActive.BLOCKED) {
@@ -77,7 +77,7 @@ const UserResetPassword = async (oldPassword: string, newPassword: string, decod
     const user = await User.findById(decodedUser.userId);
 
     if (!user) {
-        throw new Error("User not found 80");
+        throw new Error("User not found from UserResetPassword");
     }
 
     const isMatch = await bcryptjs.compare(oldPassword, user.password as string);

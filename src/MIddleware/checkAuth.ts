@@ -18,17 +18,17 @@ export const checkAuth =(...role : string[]) => async(req:Request , res:Response
          const isUser = await User.findOne({ email : verify.email });
 
             if (!isUser) {
-                throw new Error("User not found");
+                throw new Error("User not found from checkAuth");
             }
         
             if(isUser.isActive === IsActive.BLOCKED) {
-                throw new Error("User is not active");
+                throw new Error("User is not active from checkAuth 1");
             }
             if(isUser.isActive === IsActive.INACTIVE) {
-                throw new Error("User is not active");
+                throw new Error("User is not active from checkAuth 2");
             }
             if(isUser.isDeleted){
-                throw new Error("User is not active");
+                throw new Error("User is not active from checkAuth 3");
             }
 
         if(!role.includes(verify.role)) {

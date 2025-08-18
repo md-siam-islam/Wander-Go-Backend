@@ -38,7 +38,7 @@ const UpdateUser = async(userId : string , payload : Partial<IUser> , decodedTok
     const user = await User.findById(userId);
 
     if(!user){
-        throw new Error("User not found");
+        throw new Error("User not found from UpdateUser");
     }
 
     if(payload.role){

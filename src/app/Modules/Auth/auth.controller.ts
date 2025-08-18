@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jsonwebtoken';
 import { User } from './../User/user.model';
 import { NextFunction, Request, Response } from "express"
 import { catchAsync } from "../utils/catchAsync"
@@ -5,20 +6,56 @@ import { AuthServices } from "./auth.services"
 import { Sendresponse } from "../utils/sendResponse"
 import httpStatus from "http-status-codes"
 import { setCookiesAccessTokenwithRefreshToken } from "../utils/setCookies"
-import { JwtPayload } from 'jsonwebtoken';
+import { createToken } from '../utils/jwt';
+import { envVariables } from '../../config/env';
+import { JwtAccessToken } from '../utils/userAccessToken';
+import passport from 'passport';
 
 
+// const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+//     const user = await AuthServices.CredentialLogin(req.body)
+
+//     setCookiesAccessTokenwithRefreshToken(res,user)
+
+//     Sendresponse(res, {
+//         success: true,
+//         statuscode: httpStatus.OK,
+//         message: "User Login Successfull",
+//         data: user
+//     })
+// })
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = await AuthServices.CredentialLogin(req.body)
+    // const user = await AuthServices.CredentialLogin(req.body)
+    passport.authenticate("local" , async (err:any , user:any , info:any ) => {
 
-    setCookiesAccessTokenwithRefreshToken(res,user)
 
-    Sendresponse(res, {
+        if(err){
+            return next(err);
+        }
+
+        if(!user){
+            return next(new Error(info.message || "Authentication failed  38"));
+        }
+
+        const tokenInfo = JwtAccessToken(user);
+
+        setCookiesAccessTokenwithRefreshToken(res,tokenInfo)
+
+        const {password, ...userWithoutPassword} = user.toObject();
+
+        Sendresponse(res, { 
         success: true,
         statuscode: httpStatus.OK,
         message: "User Login Successfull",
-        data: user
+        accessToken: tokenInfo.accessToken,
+        refreshToken: tokenInfo.refreshToken,
+        data: userWithoutPassword
     })
+
+
+    })(req,res,next)
+
+    
 })
 
 const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -72,7 +109,7 @@ const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextF
 
     
 
-    await AuthServices.UserResetPassword( oldPassword,newPassword,decodedUser);
+    await AuthServices.UserResetPassword( oldPassword,newPassword , decodedUser as JwtPayload);
 
 
     Sendresponse(res, {
@@ -84,9 +121,29 @@ const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextF
 });
 
 
+const GoogleAuthCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+     const user = req.user;
+
+     console.log("Google Auth Callback User:", user);
+
+     if(!user) {
+        return next(new Error("User not found")); 
+     }
+
+     const tokenInfo = JwtAccessToken(user)
+    setCookiesAccessTokenwithRefreshToken(res, tokenInfo);
+
+    res.redirect(envVariables.FRONTEND_URL);
+
+
+})
+
+
 export const AuthController = {
     LoginUser,
     RefreshToken,
     LogoutUser,
-    ResetPassword
+    ResetPassword,
+    GoogleAuthCallback
 }
