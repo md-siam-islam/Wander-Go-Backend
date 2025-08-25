@@ -15,8 +15,32 @@ export const globalErrorHandle = ( error : any, req:Request , res: Response , ne
             error: error.keyValue,
         })
     }
+    
+    if(error.name === "CastError"){
+        const message = `Invalid ${error.path} : ${error.value}`
+        return res.status(400).json({
+            success: false,
+            message,
+        })
+    }
+    
+    if(error.name === "ValidationError"){
+        const message = Object.values(error.errors).map((val:any) => val.message).join(", ")
+        console.log("Validation Error" , message);
+        return res.status(400).json({
+            success: false,
+            message,
+        })
+    }
 
-
+    if(error.name === "ZodError"){
+        const message = error.errors.map((err:any) => err.message).join(", ")
+        console.log("Zod Validation Error" , message);
+        return res.status(400).json({
+            success: false,
+            message,
+        })
+    }
 
       // Custom error (service থেকে throw করা হয়েছে)
     if (error.statusCode) {
