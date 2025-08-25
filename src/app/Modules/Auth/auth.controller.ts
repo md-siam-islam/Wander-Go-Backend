@@ -24,6 +24,7 @@ import passport from 'passport';
 //         data: user
 //     })
 // })
+
 const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // const user = await AuthServices.CredentialLogin(req.body)
     passport.authenticate("local" , async (err:any , user:any , info:any ) => {

@@ -1,4 +1,5 @@
 
+import httpStatus from 'http-status-codes';
 import { Jwt, JwtPayload } from "jsonwebtoken";
 import { IAuthprovider, IUser, Role } from "./user.interface";
 import { User } from "./user.model";
@@ -9,11 +10,13 @@ const Createuser = async (payload: Partial<IUser>) => {
 
     const { email,password, ...rest } = payload
 
-    const emailExists = await User.findOne({ email });
+    // const emailExists = await User.findOne({ email });
 
-    if (emailExists) {
-        throw new Error("User already exists");
-    }
+//    if (emailExists) {
+//         const error: any = new Error("User already exists");
+//         error.statusCode = 409; 
+//         throw error;
+//     }
 
     const hashedPassword = await bcryptjs.hash(password as string , Number(envVariables.BCRYPT_SALT_ROUNDS))
     console.log(hashedPassword)

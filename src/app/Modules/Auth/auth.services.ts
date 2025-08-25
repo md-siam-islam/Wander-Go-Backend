@@ -7,31 +7,31 @@ import { envVariables } from "../../config/env";
 import { JwtAccessToken } from "../utils/userAccessToken";
 
 
-const CredentialLogin = async (payload : Partial<IUser>) => {
-    const { email, password } = payload;
+// const CredentialLogin = async (payload : Partial<IUser>) => {
+//     const { email, password } = payload;
 
-    const user = await User.findOne({ email });
+//     const user = await User.findOne({ email });
 
-    if (!user) {
-        throw new Error("User not found from CredentialLogin");
-    }
-    // Check password
-    const isMatch = await bcryptjs.compare(password as string, user.password as string);
+//     if (!user) {
+//         throw new Error("User not found from CredentialLogin");
+//     }
+//     // Check password
+//     const isMatch = await bcryptjs.compare(password as string, user.password as string);
 
-    if (!isMatch) {
-        throw new Error("Invalid credentials");
-    }
+//     if (!isMatch) {
+//         throw new Error("Invalid credentials");
+//     }
 
-    const userAssesToken = JwtAccessToken(user)
+//     const userAssesToken = JwtAccessToken(user)
 
-    const {password: pas , ...rest} = user.toObject();
+//     const {password: pas , ...rest} = user.toObject();
 
-    return {
-       accessToken: userAssesToken.accessToken,
-       refreshToken: userAssesToken.refreshToken,
-       user :rest
-    }; 
-}
+//     return {
+//        accessToken: userAssesToken.accessToken,
+//        refreshToken: userAssesToken.refreshToken,
+//        user :rest
+//     }; 
+// }
 
 const generateRefreshToken = async (refreshToken: string) => {
 
@@ -97,7 +97,7 @@ const UserResetPassword = async (oldPassword: string, newPassword: string, decod
 }
 
 export const AuthServices = {
-    CredentialLogin,
+    // CredentialLogin,
     generateRefreshToken,
     UserResetPassword
 };

@@ -9,7 +9,7 @@ import { JwtPayload } from "jsonwebtoken";
 // user create function
 const CreateUser = catchAsync (async(req:Request , res:Response, next:NextFunction) =>{
         
-  const user = UserServices.Createuser(req.body)
+  const user = await UserServices.Createuser(req.body)
 
         Sendresponse(res,{
             success : true,
