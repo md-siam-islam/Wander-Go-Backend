@@ -7,8 +7,6 @@ import { checkAuth } from '../../../MIddleware/checkAuth';
 
 const router = express.Router()
 
-
-
 router.post('/register'
     ,validateUser(createUserZoodSchema)
     ,UserController.CreateUser)
