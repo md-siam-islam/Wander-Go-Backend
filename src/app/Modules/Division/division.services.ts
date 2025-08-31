@@ -48,8 +48,35 @@ const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
 
 }
 
+const getSingleDivision = async (slug: string) => {
+
+    const division = await Division.findOne({slug});
+
+    if(!division){
+        throw new Error("Division not found");
+    }
+
+    return {
+       data : division
+    };
+}
+
+
+const DeleteDivision = async (id: string) => {
+    const existingDivision = await Division.findById(id);
+
+    if (!existingDivision) {
+        throw new Error("Division not found");
+    }
+
+    await Division.findByIdAndDelete(id);
+    return null;
+};
+
 export const DivisionServices = {
     CreateDivision,
     GetAllDivision,
-    UpdatedDivision
+    UpdatedDivision,
+    DeleteDivision,
+    getSingleDivision
 }

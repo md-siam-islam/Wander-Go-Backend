@@ -43,9 +43,39 @@ const updatedDivision = catchAsync(async (req:Request , res:Response, next:NextF
 })
 
 
+const getDivisionSingle = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+
+    const {slug} = req.params;
+
+    const division = await DivisionServices.getSingleDivision(slug);
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Division Retrieved Successfully",
+        data : division
+    })
+})
+
+
+const DeleteDivision = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+    const {id} = req.params;
+    await DivisionServices.DeleteDivision(id);
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Division Deleted Successfully",
+        data : null
+    })
+})
+
+
 
  export const DivisionController = {
     createDivision,
     getAllDivision,
-    updatedDivision
+    updatedDivision,
+    DeleteDivision,
+    getDivisionSingle
 }
