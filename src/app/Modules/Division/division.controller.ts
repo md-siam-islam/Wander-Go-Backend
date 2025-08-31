@@ -28,9 +28,24 @@ const getAllDivision = catchAsync(async (req:Request , res:Response, next:NextFu
         })
 })
 
+const updatedDivision = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+
+    const { id } = req.params;
+    const payload = req.body;
+    const updated = await DivisionServices.UpdatedDivision(id, payload);
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Division Updated Successfully",
+        data : updated
+    })
+})
+
 
 
  export const DivisionController = {
     createDivision,
-    getAllDivision
+    getAllDivision,
+    updatedDivision
 }

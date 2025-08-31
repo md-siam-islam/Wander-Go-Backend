@@ -27,7 +27,29 @@ const GetAllDivision = async () => {
     };
 }
 
+
+const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
+
+    const existingDivision = await Division.findById(id)
+
+    if(!existingDivision){
+        throw new Error("Division not found")
+    }
+
+    const DublicateDivision = await Division.findOne({name : payload.name , _id : {$ne : id}})
+
+    if(DublicateDivision){
+        throw new Error("Division already exists")
+    }
+
+    const updatedDivision = await Division.findByIdAndUpdate(id, payload , {new : true , runValidators : true})
+
+    return updatedDivision
+
+}
+
 export const DivisionServices = {
     CreateDivision,
-    GetAllDivision
+    GetAllDivision,
+    UpdatedDivision
 }

@@ -1,9 +1,12 @@
 import express from 'express';
 import { DivisionController } from './division.controller';
+import { createDivisionZoodSchema, updateDivisionZoodSchema } from './division.validate';
+import { validateDivision } from '../../../MIddleware/validate.division';
 
 const router = express.Router()
 
-router.post("/create" , DivisionController.createDivision)
+router.post("/create" ,  validateDivision(createDivisionZoodSchema), DivisionController.createDivision)
 router.get("/" , DivisionController.getAllDivision)
+router.patch("/:id" , validateDivision(updateDivisionZoodSchema) , DivisionController.updatedDivision)
 
-export const DivisionRoutes = router
+export const DivisionRoutes = router 
