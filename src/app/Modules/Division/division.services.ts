@@ -1,5 +1,4 @@
 import { IDivision } from './division.interface';
-import { catchAsync } from "../utils/catchAsync";
 import { Division } from './division.model';
 
 const CreateDivision = async (payload: IDivision) => {
@@ -10,6 +9,14 @@ const CreateDivision = async (payload: IDivision) => {
             throw new Error("Division already exists")
         }
 
+        const baseSlug = payload.name.toLocaleLowerCase().split(" ").join("-");
+        let slug = `${baseSlug}-division`;
+
+        let count = 0;
+        while (await Division.exists({ slug})){
+            slug = `${slug}-${count++}`;
+        }
+        payload.slug = slug;
         const division = await Division.create(payload)
         return division
 }
