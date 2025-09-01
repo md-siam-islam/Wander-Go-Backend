@@ -99,13 +99,21 @@ const CreateTour = async (payload : ITour) => {
 const getAllTour = async (query: Record<string, string>) => {
 
     const filter = query
-
+    // search
     const searchTerm = query.searchTerm || ""
-
+    // sort korci je kon field onujayi
     const sort = query.sort || "-createdAt"
 
-    const field = query.field.split(",").join(" ") || ""
+    // field selection
+    //  jehetu amra string hishebe pabo tai split kore array
+    const field = query.field?.split(",").join(" ") || ""
 
+    const page = Number(query.page) || 1
+    const limit = Number(query.limit) || 10
+    const skip = (page - 1) * limit
+
+
+    // delete unwanted fields from filter object
     for(const field of deleteFields){
         delete filter[field]
     }
@@ -114,7 +122,7 @@ const getAllTour = async (query: Record<string, string>) => {
         [field] : {$regex : searchTerm , $options : "i"}
     }))}
 
-    const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field)
+    const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit)
 
     const totalTour = await Tour.countDocuments()
 
