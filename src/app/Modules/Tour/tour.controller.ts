@@ -7,7 +7,7 @@ import { Sendresponse } from "../utils/sendResponse";
 
 const TourtypeCreate = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const TourType = await TourServices.CreateTour(req.body)
+    const TourType = await TourServices.CreateTourtype(req.body)
 
     Sendresponse(res,{
         success : true,
@@ -57,6 +57,7 @@ const UpdateTourtype = catchAsync(async (req:Request , res:Response, next:NextFu
         data : Tourtype
     })
 })
+
 const DeleteTourtype = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
     const {id} = req.params
 
@@ -70,10 +71,27 @@ const DeleteTourtype = catchAsync(async (req:Request , res:Response, next:NextFu
     })
 })
 
+// tour type controller end //
+
+// tour controller start //
+
+const TourCreate = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+
+    const Tour = await TourServices.CreateTour(req.body)
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Tour Created Successfully",
+        data : Tour
+    })
+})
+
 export const TourController = {
     TourtypeCreate,
     getAllTourtype,
     GetSingleTourtype,
+    TourCreate,
     UpdateTourtype,
     DeleteTourtype
 }

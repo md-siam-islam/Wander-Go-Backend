@@ -1,9 +1,9 @@
-import { ITourtype } from './tour.interface';
-import { TourType } from './tour.model';
+import { ITour, ITourtype } from './tour.interface';
+import { Tour, TourType } from './tour.model';
 
 
 //----- Tour Type Services starts -----//
-const CreateTour = async (payload: ITourtype) => {
+const CreateTourtype = async (payload: ITourtype) => {
     // Implementation for creating a tour
     // const Existour = await TourType.findOne({name: payload.name}) 
 
@@ -68,7 +68,34 @@ const DeleteTourtype = async(id: string ) => {
 
 //----- Tour Type Services end -----//
 
+
+// Tour Services
+
+const CreateTour = async (payload : ITour) => {
+
+    const ExistingTour = await Tour.findOne({title : payload.title})
+    if(ExistingTour){
+        throw new Error("Tour already exists")
+    }
+
+    const baseTour = payload.title.toUpperCase().split(" ").join("-")
+    let slug = `${baseTour}-tour`
+
+    let count = 0;
+
+    while( await Tour.exists({slug})){
+        slug = `${baseTour}-tour-${count++}`
+
+    }
+    payload.slug = slug;
+
+
+    const tour = await Tour.create(payload)
+    return tour
+}
+
 export const TourServices = {
+    CreateTourtype,
     CreateTour,
     getAllTourtype,
     GetSingleTourtype,

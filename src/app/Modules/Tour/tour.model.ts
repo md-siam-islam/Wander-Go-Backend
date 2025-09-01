@@ -12,7 +12,7 @@ export const TourType = model<ITourtype>("TourType", TourtypeSchema);
 
 const TourSchema = new Schema<ITour>( {
     title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    slug: { type: String, unique: true },
     description: { type: String },
     images: { type: [String] , default: [] },
     location: { type: String },
