@@ -4,11 +4,11 @@ import { TourType } from './tour.model';
 
 const CreateTour = async (payload: ITourtype) => {
     // Implementation for creating a tour
-    const Existour = await TourType.findOne({name: payload.name}) 
+    // const Existour = await TourType.findOne({name: payload.name}) 
 
-    if(Existour){
-        throw new Error("Tour Type already exists")
-    }
+    // if(Existour){
+    //     throw new Error("Tour Type already exists")
+    // }
 
     const tourtype = await TourType.create(payload)
 
@@ -19,12 +19,33 @@ const CreateTour = async (payload: ITourtype) => {
 const getAllTourtype = async () => {
 
     const tourType = await TourType.find({});
-    
-    return tourType;
+
+    const totalTourType = await TourType.countDocuments();
+
+    return {
+       data : tourType,
+       meta : {
+        total : totalTourType
+       }
+    };
+}
+
+const GetSingleTourtype = async(id: string) => {
+
+    const TourId = await TourType.findById(id)
+
+    if(!TourId){
+        throw new Error("Tour Type not found")
+    }
+    const tourtype = await TourType.findById(id)
+
+    return tourtype
+
 }
 
 export const TourServices = {
     CreateTour,
-    getAllTourtype
+    getAllTourtype,
+    GetSingleTourtype
 }
 
