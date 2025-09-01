@@ -89,7 +89,10 @@ const TourCreate = catchAsync(async (req:Request , res:Response, next:NextFuncti
 
 const getAlltour = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const Tour = await TourServices.getAllTour()
+    const query = req.query
+
+    const Tour = await TourServices.getAllTour(query as Record<string, string>)
+    
     Sendresponse(res,{
         success : true,
         statuscode : httpStatus.OK,

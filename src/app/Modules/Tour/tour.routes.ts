@@ -1,7 +1,9 @@
 import  express  from 'express';
 import { TourController } from './tour.controller';
 import { validateDivision } from '../../../MIddleware/validate.division';
-import { tourValidationSchema } from './tour.vallidate';
+import { tourValidationSchema, updateTourValidationSchema } from './tour.vallidate';
+import { checkAuth } from '../../../MIddleware/checkAuth';
+import { Role } from '../User/user.interface';
 
 
 const router = express.Router()
@@ -15,10 +17,10 @@ router.delete("/tour-types/:id" , TourController.DeleteTourtype)
 
 // tour routes
 
-router.post("/create" , validateDivision(tourValidationSchema), TourController.TourCreate)
+router.post("/create" ,checkAuth(Role.ADMIN , Role.SUPER_ADMIN),validateDivision(tourValidationSchema), TourController.TourCreate)
 router.get("/", TourController.getAlltour)
 router.get("/:id" , TourController.GetSingleTour)
-router.patch("/:id" , TourController.UpdateTour)
-router.delete("/:id" , TourController.DeleteTour)
+router.patch("/:id" ,checkAuth(Role.ADMIN , Role.SUPER_ADMIN),validateDivision(updateTourValidationSchema), TourController.UpdateTour)
+router.delete("/:id" ,checkAuth(Role.ADMIN , Role.SUPER_ADMIN), TourController.DeleteTour)
 
 export const TourRoutes = router

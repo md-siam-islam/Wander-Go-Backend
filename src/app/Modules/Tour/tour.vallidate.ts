@@ -18,3 +18,28 @@ export const tourValidationSchema = z.object({
   division: z.string().min(1, "Division is required"),
   tourType: z.string().min(1, "TourType is required"),
 });
+
+
+export const updateTourValidationSchema = z.object({
+  title: z.string().min(1, "Title is required").optional(),
+  description: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  location: z.string().optional(),
+  costFrom: z.number().optional(),
+  startDate: z.preprocess(
+    (val) => (val ? new Date(val as string) : undefined),
+    z.date().optional()
+  ).optional(),
+  endDate: z.preprocess(
+    (val) => (val ? new Date(val as string) : undefined),
+    z.date().optional()
+  ).optional(),
+  included: z.array(z.string()).optional(),
+  excluded: z.array(z.string()).optional(),
+  amenities: z.array(z.string()).optional(),
+  tourPlan: z.array(z.string()).optional(),
+  maxGests: z.number().optional(),
+  minAge: z.number().optional(),
+  division: z.string().optional(),
+  tourType: z.string().optional(),
+});
