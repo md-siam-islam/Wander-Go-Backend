@@ -17,6 +17,7 @@ router.delete("/tour-types/:id" , TourController.DeleteTourtype)
 
 router.post("/create" , validateDivision(tourValidationSchema), TourController.TourCreate)
 router.get("/", TourController.getAlltour)
+router.get("/:id" , TourController.GetSingleTour)
 router.patch("/:id" , TourController.UpdateTour)
 
 
