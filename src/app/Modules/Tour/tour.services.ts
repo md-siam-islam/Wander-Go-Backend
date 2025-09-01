@@ -101,13 +101,16 @@ const getAllTour = async (query: Record<string, string>) => {
 
     const searchTerm = query.searchTerm || ""
 
+    const sort = query.sort || "-createdAt"
+
     delete filter["searchTerm"]
+    delete filter["sort"]
 
     const SearchQuery = { $or : searchField.map(field => ({
         [field] : {$regex : searchTerm , $options : "i"}
     }))}
 
-    const tour = await Tour.find(SearchQuery).find(filter)
+    const tour = await Tour.find(SearchQuery).find(filter).sort(sort)
 
     const totalTour = await Tour.countDocuments()
 
@@ -118,6 +121,8 @@ const getAllTour = async (query: Record<string, string>) => {
         }
     }
 }
+
+
 
 const GetSingleTour = async (id: string) => {
     const existingTour = await Tour.findById(id)
