@@ -94,10 +94,24 @@ const CreateTour = async (payload : ITour) => {
     return tour
 }
 
+const getAllTour = async () => {
+    const tour = await Tour.find({})
+
+    const totalTour = await Tour.countDocuments()
+
+    return {
+        data: tour,
+        meta: {
+            total: totalTour
+        }
+    }
+}
+
 export const TourServices = {
     CreateTourtype,
     CreateTour,
     getAllTourtype,
+    getAllTour,
     GetSingleTourtype,
     UpdateTourtype,
     DeleteTourtype
