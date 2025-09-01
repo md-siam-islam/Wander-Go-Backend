@@ -127,10 +127,13 @@ const getAllTour = async (query: Record<string, string>) => {
     const totalTour = await Tour.countDocuments()
 
     return {
-        data: tour,
         meta: {
-            total: totalTour
-        }
+            page: page,
+            limit: limit,
+            total: totalTour,
+            totalPage : Math.ceil(totalTour/limit)
+        },
+        data: tour
     }
 }
 
