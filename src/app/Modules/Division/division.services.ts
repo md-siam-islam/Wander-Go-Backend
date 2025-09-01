@@ -49,7 +49,7 @@ const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
     if(DublicateDivision){
         throw new Error("Division already exists")
     }
-    
+
     if(payload.name){
         const baseSlug = payload.name.toLocaleLowerCase().split(" ").join("-");
         let slug = `${baseSlug}-division`;
@@ -87,7 +87,6 @@ const DeleteDivision = async (id: string) => {
     if (!existingDivision) {
         throw new Error("Division not found");
     }
-
     await Division.findByIdAndDelete(id);
     return null;
 };

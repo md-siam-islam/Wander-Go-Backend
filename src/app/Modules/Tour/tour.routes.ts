@@ -9,5 +9,6 @@ router.post("/create-tour-type" , TourController.TourtypeCreate)
 router.get("/tour-types" , TourController.getAllTourtype)
 router.get("/tour-types/:id" , TourController.GetSingleTourtype)
 router.patch("/tour-types/:id" , TourController.UpdateTourtype)
+router.delete("/tour-types/:id" , TourController.DeleteTourtype)
 
 export const TourRoutes = router
