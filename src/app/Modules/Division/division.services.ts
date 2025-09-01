@@ -17,6 +17,7 @@ const CreateDivision = async (payload: IDivision) => {
             slug = `${slug}-${count++}`;
         }
         payload.slug = slug;
+
         const division = await Division.create(payload)
         return division
 }
@@ -47,6 +48,17 @@ const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
 
     if(DublicateDivision){
         throw new Error("Division already exists")
+    }
+    
+    if(payload.name){
+        const baseSlug = payload.name.toLocaleLowerCase().split(" ").join("-");
+        let slug = `${baseSlug}-division`;
+
+        let count = 0;
+        while (await Division.exists({ slug})){
+            slug = `${slug}-${count++}`;
+        }
+        payload.slug = slug;
     }
 
     const updatedDivision = await Division.findByIdAndUpdate(id, payload , {new : true , runValidators : true})
