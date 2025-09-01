@@ -78,7 +78,7 @@ const CreateTour = async (payload : ITour) => {
         throw new Error("Tour already exists")
     }
 
-    const baseTour = payload.title.toUpperCase().split(" ").join("-")
+    const baseTour = payload.title.toLocaleLowerCase().split(" ").join("-")
     let slug = `${baseTour}-tour`
 
     let count = 0;
@@ -107,6 +107,35 @@ const getAllTour = async () => {
     }
 }
 
+const UpdateTour = async (id: string , payload: Partial<ITour>) => {
+
+    const exitingTour = await Tour.findById(id)
+    if(!exitingTour){
+        throw new Error("Tour not found")
+    }
+
+    if(payload.title){
+        const baseTour = payload.title.toUpperCase().split(" ").join("-")
+    let slug = `${baseTour}-tour`
+
+    let count = 0;
+
+    while( await Tour.exists({slug})){
+        slug = `${baseTour}-tour-${count++}`
+
+    }
+    payload.slug = slug;
+
+    }
+
+    const updatedTour = await Tour.findByIdAndUpdate(id, payload , {new: true , runValidators : true})
+
+    return updatedTour
+
+
+}
+
+
 export const TourServices = {
     CreateTourtype,
     CreateTour,
@@ -114,6 +143,7 @@ export const TourServices = {
     getAllTour,
     GetSingleTourtype,
     UpdateTourtype,
+    UpdateTour,
     DeleteTourtype
 }
 

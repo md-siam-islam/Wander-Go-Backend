@@ -17,6 +17,7 @@ router.delete("/tour-types/:id" , TourController.DeleteTourtype)
 
 router.post("/create" , validateDivision(tourValidationSchema), TourController.TourCreate)
 router.get("/", TourController.getAlltour)
+router.patch("/:id" , TourController.UpdateTour)
 
 
 export const TourRoutes = router

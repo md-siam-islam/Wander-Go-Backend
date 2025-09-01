@@ -98,6 +98,21 @@ const getAlltour = catchAsync(async (req:Request , res:Response, next:NextFuncti
     })
 })
 
+const UpdateTour = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+    const {id} = req.params
+
+    const payload = req.body
+
+    const Tour = await TourServices.UpdateTour(id , payload)
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Tour Updated Successfully",
+        data : Tour
+    })
+})
+
 export const TourController = {
     TourtypeCreate,
     getAllTourtype,
@@ -105,5 +120,6 @@ export const TourController = {
     GetSingleTourtype,
     TourCreate,
     UpdateTourtype,
+    UpdateTour,
     DeleteTourtype
 }
