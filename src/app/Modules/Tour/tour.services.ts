@@ -1,3 +1,4 @@
+import { deleteFields } from '../../consts';
 import { ITour, ITourtype } from './tour.interface';
 import { Tour, TourType } from './tour.model';
 import { searchField } from './tour.searchfield';
@@ -103,14 +104,17 @@ const getAllTour = async (query: Record<string, string>) => {
 
     const sort = query.sort || "-createdAt"
 
-    delete filter["searchTerm"]
-    delete filter["sort"]
+    const field = query.field.split(",").join(" ") || ""
+
+    for(const field of deleteFields){
+        delete filter[field]
+    }
 
     const SearchQuery = { $or : searchField.map(field => ({
         [field] : {$regex : searchTerm , $options : "i"}
     }))}
 
-    const tour = await Tour.find(SearchQuery).find(filter).sort(sort)
+    const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field)
 
     const totalTour = await Tour.countDocuments()
 

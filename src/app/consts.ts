@@ -1,0 +1,1 @@
+export const deleteFields = ["searchTerm" , "sort", "field" ]
