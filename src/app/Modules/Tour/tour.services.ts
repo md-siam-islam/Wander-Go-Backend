@@ -1,5 +1,6 @@
 import { ITour, ITourtype } from './tour.interface';
 import { Tour, TourType } from './tour.model';
+import { searchField } from './tour.searchfield';
 
 
 //----- Tour Type Services starts -----//
@@ -95,8 +96,18 @@ const CreateTour = async (payload : ITour) => {
 }
 
 const getAllTour = async (query: Record<string, string>) => {
-    
-    const tour = await Tour.find(query)
+
+    const filter = query
+
+    const searchTerm = query.searchTerm || ""
+
+    delete filter["searchTerm"]
+
+    const SearchQuery = { $or : searchField.map(field => ({
+        [field] : {$regex : searchTerm , $options : "i"}
+    }))}
+
+    const tour = await Tour.find(SearchQuery).find(filter)
 
     const totalTour = await Tour.countDocuments()
 
