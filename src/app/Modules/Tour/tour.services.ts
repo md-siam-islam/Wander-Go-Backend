@@ -43,9 +43,22 @@ const GetSingleTourtype = async(id: string) => {
 
 }
 
+const UpdateTourtype = async(id : string , payload: Partial<ITourtype>) => {
+
+    const existingTourtype = await TourType.findById(id)
+    if(!existingTourtype){
+        throw new Error("Tour Type not found")
+    }
+
+    const NewTourtype = await TourType.findByIdAndUpdate(id , payload, {new: true , runValidators: true})
+
+    return NewTourtype
+}
+
 export const TourServices = {
     CreateTour,
     getAllTourtype,
-    GetSingleTourtype
+    GetSingleTourtype,
+    UpdateTourtype
 }
 
