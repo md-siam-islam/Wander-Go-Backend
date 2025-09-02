@@ -1,7 +1,9 @@
+import { Query } from 'mongoose';
 import { deleteFields } from '../../consts';
 import { ITour, ITourtype } from './tour.interface';
 import { Tour, TourType } from './tour.model';
 import { searchField } from './tour.searchfield';
+import { QueryBuilder } from '../utils/QueryBulder';
 
 
 //----- Tour Type Services starts -----//
@@ -72,7 +74,6 @@ const DeleteTourtype = async(id: string ) => {
 
 
 // Tour Services
-
 const CreateTour = async (payload : ITour) => {
 
     const ExistingTour = await Tour.findOne({title : payload.title})
@@ -98,44 +99,65 @@ const CreateTour = async (payload : ITour) => {
 
 const getAllTour = async (query: Record<string, string>) => {
 
-    const filter = query
-    // search
-    const searchTerm = query.searchTerm || ""
-    // sort korci je kon field onujayi
-    const sort = query.sort || "-createdAt"
+    const modelQuery =  new QueryBuilder(Tour.find() , query)
+    const Tours = await modelQuery.
+    search(searchField).
+    filter().
+    sort().
+    field().
+    pagination()
 
-    // field selection
-    //  jehetu amra string hishebe pabo tai split kore array
-    const field = query.field?.split(",").join(" ") || ""
+    // const metaData = await modelQuery.Getmeta()
 
-    const page = Number(query.page) || 1
-    const limit = Number(query.limit) || 10
-    const skip = (page - 1) * limit
-
-
-    // delete unwanted fields from filter object
-    for(const field of deleteFields){
-        delete filter[field]
-    }
-
-    const SearchQuery = { $or : searchField.map(field => ({
-        [field] : {$regex : searchTerm , $options : "i"}
-    }))}
-
-    const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit)
-
-    const totalTour = await Tour.countDocuments()
+    const [data , meta ] = await Promise.all([
+        Tours.build(),
+        modelQuery.Getmeta()
+    ])
 
     return {
-        meta: {
-            page: page,
-            limit: limit,
-            total: totalTour,
-            totalPage : Math.ceil(totalTour/limit)
-        },
-        data: tour
+        data,
+        meta
     }
 }
+
+// const getAllTour = async (query: Record<string, string>) => {
+
+//     const filter = query
+   
+//     const searchTerm = query.searchTerm || ""
+   
+//     const sort = query.sort || "-createdAt"
+
+    
+//     const field = query.field?.split(",").join(" ") || ""
+
+//     const page = Number(query.page) || 1
+//     const limit = Number(query.limit) || 10
+//     const skip = (page - 1) * limit
+
+
+//     delete unwanted fields from filter object
+//     for(const field of deleteFields){
+//         delete filter[field]
+//     }
+
+//     const SearchQuery = { $or : searchField.map(field => ({
+//         [field] : {$regex : searchTerm , $options : "i"}
+//     }))}
+
+//     const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit)
+//     const totalTour = await Tour.countDocuments()
+
+//     return {
+//         meta: {
+//             page: page,
+//             limit: limit,
+//             total: totalTour,
+//             totalPage : Math.ceil(totalTour/limit)
+//         },
+//         data: tour
+//     }
+// }
 
 
 

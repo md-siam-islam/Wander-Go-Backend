@@ -15,6 +15,8 @@ export const tourValidationSchema = z.object({
   tourPlan: z.array(z.string()).default([]),
   maxGests: z.number().optional(),
   minAge: z.number().optional(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
   division: z.string().min(1, "Division is required"),
   tourType: z.string().min(1, "TourType is required"),
 });
@@ -40,6 +42,8 @@ export const updateTourValidationSchema = z.object({
   tourPlan: z.array(z.string()).optional(),
   maxGests: z.number().optional(),
   minAge: z.number().optional(),
+  departureLocation: z.string().optional(),
+  arrivalLocation: z.string().optional(),
   division: z.string().optional(),
   tourType: z.string().optional(),
 });

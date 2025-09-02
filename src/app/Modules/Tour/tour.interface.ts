@@ -18,6 +18,8 @@ amenities?: string[];
 tourPlan?: string[];
 maxGests?: number;
 minAge?: number;
+departureLocation ?: string;
+arrivalLocation?: string;
 division: Types.ObjectId;
 tourType: Types.ObjectId;
 
