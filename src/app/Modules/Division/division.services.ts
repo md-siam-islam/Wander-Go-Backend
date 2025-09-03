@@ -1,5 +1,8 @@
+import { deleteFields } from '../../consts';
+import { QueryBuilder } from '../utils/QueryBulder';
 import { IDivision } from './division.interface';
 import { Division } from './division.model';
+import { searchField } from './division.searchField';
 
 const CreateDivision = async (payload: IDivision) => {
 
@@ -22,18 +25,62 @@ const CreateDivision = async (payload: IDivision) => {
         return division
 }
 
-const GetAllDivision = async () => {
-    const divisions = await Division.find({});
+const GetAllDivision = async (query:Record<string, string>) => {
 
-    const totalDivisions = await Division.countDocuments();
+    const divisionsQueryBuilder = new QueryBuilder(Division.find(), query)
+    const divisions = await divisionsQueryBuilder.search(searchField).
+    filter().
+    sort().
+    field().
+    pagination()
+
+    const [data , meta] = await Promise.all([
+        divisions.build(),
+        divisionsQueryBuilder.Getmeta()
+    ])
 
     return {
-        data : divisions,
-        meta : {
-            total : totalDivisions
-        }
+       data,
+       meta
     };
 }
+
+// const GetAllDivision = async (query:Record<string, string>) => {
+
+//     const filter = query
+//     const searchTerm = query.searchTerm || ""
+//     const field = query.field?.split(",").join(" ") || ""
+//     const sort = query.sort || "-createdAt"
+
+//     const page = Number(query.page) || 1
+//     const limit = Number(query.limit) || 6
+//     const skip = (page - 1)*limit
+
+//     for(const field of deleteFields){
+//         delete filter[field]
+//     }
+
+
+//     const searchQuery = {$or : searchField.map(field => ({
+//         [field] : {$regex : searchTerm , $options: "i"}
+//     }))}
+
+    
+//     const divisions = await Division.find(searchQuery).find(filter).sort(sort).select(field).limit(limit).
+//     skip(skip)
+
+//     const totalDivisions = await Division.countDocuments();
+
+//     return {
+//         data : divisions,
+//         meta : {
+//             total : totalDivisions,
+//             page : page,
+//             limit : limit,
+//             totalPage : Math.ceil(totalDivisions/limit)
+//         }
+//     };
+// }
 
 
 const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
