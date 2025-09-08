@@ -7,11 +7,11 @@ const paymentSchema = new Schema<IPayment>({
         type : Schema.Types.ObjectId,
         ref : "Booking",
         required : true,
-        unique : true
     },
     transactionId : {
         type : String,
-        required : true,
+        required: true,
+        default: () => `tran_${Date.now()}_${Math.floor(Math.random()*1000)}`,
         unique : true
     },
     amount : {

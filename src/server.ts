@@ -10,6 +10,7 @@ const PORT = envVariables.PORT || 5000;
 async function StartServer() {
     try {
         await mongoose.connect(envVariables.DB_URL)
+
         // await mongoose.connect("mongodb+srv://wandergo:pBf1Mto6IvEySCwN@cluster0.5b559.mongodb.net/WanderGo?retryWrites=true&w=majority&appName=Cluster0")
 
     server = app.listen(PORT , () => {

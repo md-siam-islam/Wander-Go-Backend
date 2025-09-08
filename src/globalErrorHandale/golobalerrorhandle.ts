@@ -7,19 +7,19 @@ export const globalErrorHandle = ( error : any, req:Request , res: Response , ne
     console.log(error)
     }
 
-    if(error.code === 11000){
-        console.log("Dublicate Key Error" , error.message);
-        const Dublicate = error.message.match(/”([^”]*)”/);
-        console.log(Dublicate);
-        const message = `Dublicate value entered for ${Dublicate?.[1]} field, please choose another value`
-        return res.status(400).json({
-            success: false,
-            message,
-            error: error.keyValue,
-        })
-    }
+    // if(error.code === 11000){
+    //     console.log("Dublicate Key Error" , error.message);
+    //     const Dublicate = error.message.match(/”([^”]*)”/);
+    //     console.log(Dublicate);
+    //     const message = `Dublicate value entered for ${Dublicate?.[1]} field, please choose another value`
+    //     return res.status(400).json({
+    //         success: false,
+    //         message,
+    //         error: error.keyValue,
+    //     })
+    // }
     
-    if (error.name === "CastError") {
+if (error.name === "CastError") {
     return res.status(400).json({
       success: false,
       message: `Invalid value for field "${error.path}": received "${error.value}"`,
