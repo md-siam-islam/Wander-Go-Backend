@@ -7,12 +7,12 @@ import { BOOKING_ENUM, IBooking } from "./booking.interface";
 import { Booking } from "./booking.model";
 import { randomUUID } from "crypto";
 
-// const getTransactionId = () => {
-//   return `tran_${Date.now()}_${randomUUID()}`;
-// };
+const getTransactionId = () => {
+  return `tran_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+};
 
 const createBooking = async (payload:Partial<IBooking> , userId : string) => {
-    // const transactionId = getTransactionId()
+    const transactionId = getTransactionId()
 
     const session = await Booking.startSession()
     session.startTransaction()
@@ -45,7 +45,7 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     const payment = await Payment.create([{
         booking : booking[0]._id,
         status : PAYMENT_STATUS.UNPAID,
-        // TransactionId : transactionId,
+        TransactionId : transactionId,
         amount : TotalAmount
     }] ,{session})
 

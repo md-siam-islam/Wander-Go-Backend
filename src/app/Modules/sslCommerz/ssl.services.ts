@@ -1,7 +1,8 @@
 import { envVariables } from "../../config/env";
 import { SSLcommrez } from "./sslCommerz.interface";
+import axios from 'axios';
 
-const sslPayment = (payload: SSLcommrez) => {
+const sslPayment = async (payload: SSLcommrez) => {
 
     const data = {
         store_id: envVariables.SSL.SSL_STORE_ID,
@@ -38,4 +39,13 @@ const sslPayment = (payload: SSLcommrez) => {
         ship_postcode: "1000" ,
         ship_country: "Bangladesh",
     }
+
+    const responsive = await axios ({
+            method : "POST",
+            url : envVariables.SSL.SSL_PAYMENT_API,
+            data : data,
+            headers : {"Content-Type" : "application/x-www-from-urlencoded"}
+    })
+
+    return responsive.data
 }
