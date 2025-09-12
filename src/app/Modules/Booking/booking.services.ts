@@ -60,7 +60,6 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
         session.endSession()
         throw error
     }
-
     
 }
 

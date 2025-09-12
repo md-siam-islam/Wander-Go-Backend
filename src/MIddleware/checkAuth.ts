@@ -10,7 +10,7 @@ export const checkAuth =(...role : string[]) => async(req:Request , res:Response
         const accessToken = req.headers.authorization
 
         if (!accessToken) {
-            throw new Error("No token provided");
+            throw new Error("No token provided from checkAuth");
         }
 
         const verify = verifyToken(accessToken , envVariables.JWT_SECRET) as JwtPayload;
