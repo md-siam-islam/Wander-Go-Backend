@@ -20,7 +20,7 @@ const sslPayment = async (payload: SSLcommrez) => {
         logistic_delivery_type : "Tour",
         product_name : "Tour",
         product_category : "Services",
-        product_profile : "Genarel",
+        product_profile : "general",
         cus_name : payload.name ,
         cus_email : payload.email ,
         cus_add1: payload.address ,
@@ -44,8 +44,13 @@ const sslPayment = async (payload: SSLcommrez) => {
             method : "POST",
             url : envVariables.SSL.SSL_PAYMENT_API,
             data : data,
-            headers : {"Content-Type" : "application/x-www-from-urlencoded"}
+            headers : { "Content-Type": "application/x-www-form-urlencoded" }
+
     })
 
     return responsive.data
 }
+
+export const SSLservices = {
+    sslPayment
+} 

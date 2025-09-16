@@ -1,6 +1,6 @@
 
 export interface SSLcommrez {
-    amount : string ,
+    amount : number ,
     transactionId : string ,
     name : string ,
     email : string ,
