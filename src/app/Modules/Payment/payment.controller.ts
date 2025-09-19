@@ -1,8 +1,24 @@
-import { Cancel } from './../../../../node_modules/axios/index.d';
+import  httpStatus  from 'http-status-codes';
 import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import { PaymentServices } from "./payment.services";
 import { envVariables } from "../../config/env";
+import { Sendresponse } from "../utils/sendResponse";
+
+const initPayment = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
+
+    const bookingId = req.params.bookingId
+
+    const result = await PaymentServices.initPayment(bookingId as string)
+
+     Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Booking payment Successfully",
+        data : result
+    })
+    
+})
 
 const successPayment = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
@@ -43,5 +59,6 @@ const cancelPayment = catchAsync (async (req:Request , res:Response, next:NextFu
 export const PaymentController = {
     successPayment,
     faildPayment,
-    cancelPayment
+    cancelPayment,
+    initPayment
 }
