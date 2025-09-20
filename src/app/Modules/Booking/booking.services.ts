@@ -84,6 +84,20 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     
 }
 
+const getAllbooking = async () => {
+
+    const allBooking = await Booking.find().populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+    return allBooking
+}
+const getsinglebooking = async (bookingId : string) => {
+
+    const singleBooking = await Booking.findById(bookingId).populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+
+    return singleBooking
+}
+
  export const BookingServices = {
-        createBooking
+        createBooking,
+        getAllbooking,
+        getsinglebooking
 }
