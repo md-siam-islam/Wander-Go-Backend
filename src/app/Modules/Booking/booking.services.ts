@@ -100,7 +100,7 @@ const getsinglebooking = async (bookingId : string) => {
 const getMybooking = async (decodedUser : JwtPayload) => {
 
 
-    const Mybooking = await Booking.findOne({user : decodedUser.userId})
+    const Mybooking = await Booking.find({user : decodedUser.userId})
 
     return Mybooking
 }
