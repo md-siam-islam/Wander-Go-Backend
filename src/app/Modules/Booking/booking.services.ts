@@ -1,4 +1,5 @@
 
+import { JwtPayload } from "jsonwebtoken";
 import { PAYMENT_STATUS } from "../Payment/payment.interface";
 import { Payment } from "../Payment/payment.model";
 import { SSLservices } from "../sslCommerz/ssl.services";
@@ -96,8 +97,18 @@ const getsinglebooking = async (bookingId : string) => {
     return singleBooking
 }
 
+const getMybooking = async (decodedUser : JwtPayload) => {
+
+
+    const Mybooking = await Booking.findOne({user : decodedUser.userId})
+
+    return Mybooking
+}
+
+
  export const BookingServices = {
         createBooking,
         getAllbooking,
-        getsinglebooking
+        getsinglebooking,
+        getMybooking
 }

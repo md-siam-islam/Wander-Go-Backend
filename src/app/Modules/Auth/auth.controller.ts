@@ -106,6 +106,7 @@ const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextF
     if (!oldPassword || !newPassword) {
         return next(new Error("Old password and new password are required"));
     }
+    
     const decodedUser = req.user;
 
     

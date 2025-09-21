@@ -32,6 +32,7 @@ const getAllbooking = catchAsync(async (req:Request, res:Response, next:NextFunc
     })
 
 })
+
 const getsinglebooking = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
 
         const {bookingId} = req.params
@@ -48,8 +49,25 @@ const getsinglebooking = catchAsync(async (req:Request, res:Response, next:NextF
 })
 
 
+const getMybooking = catchAsync(async (req:Request, res:Response, next:NextFunction) => {
+
+            const decodedUser = req.user
+
+            const result = await BookingServices.getMybooking(decodedUser as JwtPayload)
+
+             Sendresponse(res,{
+                success : true,
+                statuscode : httpStatus.OK,
+                message : "My Booking Get Successfully",
+                data : result
+            })
+
+})
+
+
 export const  BookingController = {
     CreateBooking,
     getAllbooking,
-    getsinglebooking
+    getsinglebooking,
+    getMybooking
 }
