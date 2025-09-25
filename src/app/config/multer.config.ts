@@ -9,7 +9,7 @@ const storage = new CloudinaryStorage({
   cloudinary: CloudinaryUpload,
   params: {
     public_id: (req: Request, file: Express.Multer.File) => {
-        console.log("Cloudinary Config File" , envVariables.CLOUDINARY.CLOUDINARY_API_KEY);
+        // console.log("Cloudinary Config File" , envVariables.CLOUDINARY.CLOUDINARY_API_KEY);
       const cleanName = file.originalname
         .toLowerCase()
         .replace(/[\s.]+/g, "-")

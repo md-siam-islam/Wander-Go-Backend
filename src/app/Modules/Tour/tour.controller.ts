@@ -3,6 +3,7 @@ import { Request , Response ,NextFunction} from "express";
 import { catchAsync } from "../utils/catchAsync";
 import { TourServices } from "./tour.services";
 import { Sendresponse } from "../utils/sendResponse";
+import { ITour } from './tour.interface';
 
 
 const TourtypeCreate = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
@@ -77,7 +78,16 @@ const DeleteTourtype = catchAsync(async (req:Request , res:Response, next:NextFu
 
 const TourCreate = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const Tour = await TourServices.CreateTour(req.body)
+    const payload : ITour = {
+        ...req.body,
+        images : (req.files as Express.Multer.File[]).map(file => file.path)
+    }
+    const Tour = await TourServices.CreateTour(payload)
+
+    console.log({
+        data : req.body,
+        files : req?.files
+    })
 
     Sendresponse(res,{
         success : true,

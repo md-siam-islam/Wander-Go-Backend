@@ -13,7 +13,7 @@ export const tourValidationSchema = z.object({
   excluded: z.array(z.string()).default([]),
   amenities: z.array(z.string()).default([]),
   tourPlan: z.array(z.string()).default([]),
-  maxGests: z.number().optional(),
+  maxGuests: z.number().optional(),
   minAge: z.number().optional(),
   departureLocation: z.string().optional(),
   arrivalLocation: z.string().optional(),
@@ -22,28 +22,48 @@ export const tourValidationSchema = z.object({
 });
 
 
+// export const updateTourValidationSchema = z.object({
+//   title: z.string().min(1, "Title is required").optional(),
+//   description: z.string().optional(),
+//   images: z.array(z.string()).optional(),
+//   location: z.string().optional(),
+//   costFrom: z.number().optional(),
+//   startDate: z.preprocess(
+//     (val) => (val ? new Date(val as string) : undefined),
+//     z.date().optional()
+//   ).optional(),
+//   endDate: z.preprocess(
+//     (val) => (val ? new Date(val as string) : undefined),
+//     z.date().optional()
+//   ).optional(),
+//   included: z.array(z.string()).optional(),
+//   excluded: z.array(z.string()).optional(),
+//   amenities: z.array(z.string()).optional(),
+//   tourPlan: z.array(z.string()).optional(),
+//   maxGests: z.number().optional(),
+//   minAge: z.number().optional(),
+//   departureLocation: z.string().optional(),
+//   arrivalLocation: z.string().optional(),
+//   division: z.string().optional(),
+//   tourType: z.string().optional(),
+// });
+
+
 export const updateTourValidationSchema = z.object({
-  title: z.string().min(1, "Title is required").optional(),
-  description: z.string().optional(),
-  images: z.array(z.string()).optional(),
-  location: z.string().optional(),
-  costFrom: z.number().optional(),
-  startDate: z.preprocess(
-    (val) => (val ? new Date(val as string) : undefined),
-    z.date().optional()
-  ).optional(),
-  endDate: z.preprocess(
-    (val) => (val ? new Date(val as string) : undefined),
-    z.date().optional()
-  ).optional(),
-  included: z.array(z.string()).optional(),
-  excluded: z.array(z.string()).optional(),
-  amenities: z.array(z.string()).optional(),
-  tourPlan: z.array(z.string()).optional(),
-  maxGests: z.number().optional(),
-  minAge: z.number().optional(),
-  departureLocation: z.string().optional(),
-  arrivalLocation: z.string().optional(),
-  division: z.string().optional(),
-  tourType: z.string().optional(),
+    title: z.string().optional(),
+    description: z.string().optional(),
+    location: z.string().optional(),
+    costFrom: z.number().optional(),
+    startDate: z.string().optional().optional(),
+    endDate: z.string().optional().optional(),
+    tourType: z.string().optional(),// <- changed here
+    included: z.array(z.string()).optional(),
+    excluded: z.array(z.string()).optional(),
+    amenities: z.array(z.string()).optional(),
+    tourPlan: z.array(z.string()).optional(),
+    maxGuest: z.number().optional(),
+    minAge: z.number().optional(),
+    departureLocation: z.string().optional(),
+    arrivalLocation: z.string().optional(),
+    deleteImages: z.array(z.string()).optional()
 });
