@@ -13,6 +13,7 @@ const CreateDivision = async (payload: IDivision) => {
         }
 
         const baseSlug = payload.name.toLocaleLowerCase().split(" ").join("-");
+                console.log(payload.name.toLocaleLowerCase());
         let slug = `${baseSlug}-division`;
 
         let count = 0;

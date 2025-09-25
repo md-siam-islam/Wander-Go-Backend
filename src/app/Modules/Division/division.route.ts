@@ -4,10 +4,16 @@ import { createDivisionZoodSchema, updateDivisionZoodSchema } from './division.v
 import { validateDivision } from '../../../MIddleware/validate.division';
 import { checkAuth } from '../../../MIddleware/checkAuth';
 import { Role } from '../User/user.interface';
+import { multerUpload } from '../../config/multer.config';
 
 const router = express.Router()
 
-router.post("/create" , validateDivision(createDivisionZoodSchema),checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.createDivision)
+router.post("/create" , 
+    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    multerUpload.single("file"),
+    validateDivision(createDivisionZoodSchema),
+    DivisionController.createDivision)
+
 router.get("/" , DivisionController.getAllDivision)
 router.patch("/:id" , validateDivision(updateDivisionZoodSchema), checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.updatedDivision)
 router.get("/:slug" , DivisionController.getDivisionSingle)

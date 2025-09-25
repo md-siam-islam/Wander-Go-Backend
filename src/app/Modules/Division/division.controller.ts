@@ -3,17 +3,25 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import { DivisionServices } from "./division.services";
 import { Sendresponse } from "../utils/sendResponse";
+import { IDivision } from './division.interface';
 
 
 const createDivision = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const create = await DivisionServices.CreateDivision(req.body)
+    const payload : IDivision = {
+        ...req.body,
+        thumbnail : req.file?.path || ""
+    }
 
-     Sendresponse(res,{
+    console.log(payload);
+
+    const result = await DivisionServices.CreateDivision(payload)
+
+    Sendresponse(res,{
             success : true,
             statuscode : httpStatus.CREATED,
             message : "Division Created Successfully",
-            data : create
+            data : result
         })
 })
 

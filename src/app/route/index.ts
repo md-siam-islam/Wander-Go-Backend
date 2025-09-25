@@ -1,6 +1,6 @@
 import express from 'express';
 import { UserRoutes } from '../Modules/User/user.routes';
-import { AuthRouter } from '../Modules/Auth/auth.router';
+import { AuthRouter } from '../Modules/Auth/auth.routes';
 import { DivisionRoutes } from '../Modules/Division/division.route';
 import { TourRoutes } from '../Modules/Tour/tour.routes';
 import { BookingRoutes } from '../Modules/Booking/booking.routes';
