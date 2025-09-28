@@ -1,24 +1,27 @@
 import { NextFunction, Request, Response } from "express";
 import { envVariables } from "../app/config/env";
+import { deleteImageFromCloudinary } from "../app/config/cloudinary.config";
 
-export const globalErrorHandle = ( error : any, req:Request , res: Response , next: NextFunction) => {
+export const globalErrorHandle = async ( error : any, req:Request , res: Response , next: NextFunction) => {
 
     if(envVariables.NODE_ENV === "development"){  
     console.log(error)
     }
 
-    // if(error.code === 11000){
-    //     console.log("Dublicate Key Error" , error.message);
-    //     const Dublicate = error.message.match(/”([^”]*)”/);
-    //     console.log(Dublicate);
-    //     const message = `Dublicate value entered for ${Dublicate?.[1]} field, please choose another value`
-    //     return res.status(400).json({
-    //         success: false,
-    //         message,
-    //         error: error.keyValue,
-    //     })
-    // }
-    
+    // cloudenary error hole image delete korar funtion 
+
+    if(req.file){
+        await deleteImageFromCloudinary(req.file.path);
+    }
+
+    if(req.files && Array.isArray(req.files) && req.files.length > 0){
+
+      await Promise.all(
+        (req.files as Express.Multer.File[]).map(async (file) => {
+            await deleteImageFromCloudinary(file.path);
+        })
+    )};
+
 if (error.name === "CastError") {
     return res.status(400).json({
       success: false,

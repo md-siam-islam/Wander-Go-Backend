@@ -77,7 +77,7 @@ const DeleteTourtype = catchAsync(async (req:Request , res:Response, next:NextFu
 // tour controller start //
 
 const TourCreate = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
-
+    // throw new Error("Testing Global Error Handling");
     const payload : ITour = {
         ...req.body,
         images : (req.files as Express.Multer.File[]).map(file => file.path)
