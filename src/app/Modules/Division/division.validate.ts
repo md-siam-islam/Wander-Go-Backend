@@ -25,7 +25,7 @@ export const updateDivisionZoodSchema = z.object({
         required_error : "Division name is required",
         invalid_type_error : "Division name must be a string"
     }).min(2 , {message : "Division name must be at least 2 characters"})
-    .max(50, {message : "Division name must be at most 50 characters"}),
+    .max(50, {message : "Division name must be at most 50 characters"}).optional(),
 
     slug : z.string({
         invalid_type_error : "Division slug must be a string"

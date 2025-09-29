@@ -1,4 +1,5 @@
 // import { deleteFields } from '../../consts';
+import { deleteImageFromCloudinary } from '../../config/cloudinary.config';
 import { QueryBuilder } from '../utils/QueryBulder';
 import { IDivision } from './division.interface';
 import { Division } from './division.model';
@@ -110,6 +111,10 @@ const UpdatedDivision = async (id: string , payload: Partial<IDivision>) => {
     }
 
     const updatedDivision = await Division.findByIdAndUpdate(id, payload , {new : true , runValidators : true})
+
+    if(payload.thumbnail && existingDivision.thumbnail){
+        deleteImageFromCloudinary(existingDivision.thumbnail);
+    }
 
     return updatedDivision
 

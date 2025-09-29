@@ -9,13 +9,18 @@ import { multerUpload } from '../../config/multer.config';
 const router = express.Router()
 
 router.post("/create" , 
-    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    // checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
     multerUpload.single("file"),
     validateDivision(createDivisionZoodSchema),
     DivisionController.createDivision)
 
 router.get("/" , DivisionController.getAllDivision)
-router.patch("/:id" , validateDivision(updateDivisionZoodSchema), checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.updatedDivision)
+router.patch("/:id" ,
+    // checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    multerUpload.single("file"), 
+    validateDivision(updateDivisionZoodSchema),
+    DivisionController.updatedDivision)
+
 router.get("/:slug" , DivisionController.getDivisionSingle)
 router.delete("/:id" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), DivisionController.DeleteDivision)
 

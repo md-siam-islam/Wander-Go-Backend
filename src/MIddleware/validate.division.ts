@@ -7,13 +7,15 @@ export const validateDivision = (zoodValidate: AnyZodObject) =>
     async (req: Request, res: Response, next: NextFunction) => {
         try {
             // console.log("Validating division data..." , req);
-            req.body = JSON.parse(req.body.data) || req.body
+            if (req.body?.data) {
+                req.body = JSON.parse(req.body.data);
+            }
             req.body = await zoodValidate.parseAsync(req.body)
             console.log(req.body);
             next()
 
         } catch (error) {
-            next(error) 
+            next(error)
         }
 
     }
