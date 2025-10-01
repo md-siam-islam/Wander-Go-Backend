@@ -193,6 +193,9 @@ const UpdateTour = async (id: string , payload: Partial<ITour>) => {
     payload.slug = slug;
 
     }
+    if(payload.images && payload.images.length > 0 && exitingTour.images && exitingTour.images.length > 0){
+        payload.images = [...payload.images , ...exitingTour.images]
+    }
 
     const updatedTour = await Tour.findByIdAndUpdate(id, payload , {new: true , runValidators : true})
 
