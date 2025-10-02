@@ -28,7 +28,8 @@ const TourSchema = new Schema<ITour>( {
     departureLocation: {type: String},
     arrivalLocation: {type : String},
     division: { type: Schema.Types.ObjectId, ref: "Division", required: true },
-    tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true }
+    tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true },
+    deletedImages: { type: [String], default: [] }
 }, {
     timestamps: true
 })

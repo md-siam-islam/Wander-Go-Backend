@@ -22,5 +22,6 @@ departureLocation ?: string;
 arrivalLocation?: string;
 division: Types.ObjectId;
 tourType: Types.ObjectId;
+deletedImages?: string[];
 
 }

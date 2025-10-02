@@ -193,9 +193,26 @@ const UpdateTour = async (id: string , payload: Partial<ITour>) => {
     payload.slug = slug;
 
     }
+
     if(payload.images && payload.images.length > 0 && exitingTour.images && exitingTour.images.length > 0){
         payload.images = [...payload.images , ...exitingTour.images]
     }
+
+    // image delete handling
+    if(payload.deletedImages && payload.deletedImages.length > 0 && exitingTour.images && exitingTour.images.length > 0){
+
+        const restDBimage = exitingTour.images.filter(imageUrl => !payload.deletedImages?.includes(imageUrl))
+
+        const updatedPayloadImages = (payload.images || [])
+        .filter(imageUrl => !payload.deletedImages?.includes(imageUrl))
+        .filter(image => !restDBimage.includes(image)) 
+
+        payload.images = [...restDBimage , ...updatedPayloadImages]
+
+
+    }
+
+
 
     const updatedTour = await Tour.findByIdAndUpdate(id, payload , {new: true , runValidators : true})
 
