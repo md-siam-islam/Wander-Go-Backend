@@ -4,6 +4,7 @@ import { ITour, ITourtype } from './tour.interface';
 import { Tour, TourType } from './tour.model';
 import { searchField } from './tour.searchfield';
 import { QueryBuilder } from '../utils/QueryBulder';
+import { deleteImageFromCloudinary } from "../../config/cloudinary.config"
 
 
 //----- Tour Type Services starts -----//
@@ -194,6 +195,8 @@ const UpdateTour = async (id: string , payload: Partial<ITour>) => {
 
     }
 
+    console.log("Payload before update:", payload);
+
     if(payload.images && payload.images.length > 0 && exitingTour.images && exitingTour.images.length > 0){
         payload.images = [...payload.images , ...exitingTour.images]
     }
@@ -215,6 +218,11 @@ const UpdateTour = async (id: string , payload: Partial<ITour>) => {
 
 
     const updatedTour = await Tour.findByIdAndUpdate(id, payload , {new: true , runValidators : true})
+        
+
+     if (Array.isArray(payload.deletedImages) && payload.deletedImages.length > 0 && exitingTour.images && exitingTour.images.length > 0) {
+    await Promise.all(payload.deletedImages.map(url => deleteImageFromCloudinary(url)))
+}
 
     return updatedTour
 

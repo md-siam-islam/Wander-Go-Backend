@@ -39,5 +39,6 @@ export const updateTourValidationSchema = z.object({
     minAge: z.number().optional(),
     departureLocation: z.string().optional(),
     arrivalLocation: z.string().optional(),
+    images: z.array(z.string()).default([]).optional(),
     deleteImages: z.array(z.string()).optional()
 });

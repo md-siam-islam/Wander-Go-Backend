@@ -5,6 +5,7 @@ import { tourValidationSchema, updateTourValidationSchema } from './tour.vallida
 import { checkAuth } from '../../../MIddleware/checkAuth';
 import { Role } from '../User/user.interface';
 import { multerUpload } from '../../config/multer.config';
+import { validateTour } from '../../../MIddleware/tourValidatio';
 
 
 const router = express.Router()
@@ -21,7 +22,7 @@ router.delete("/tour-types/:id" , TourController.DeleteTourtype)
 router.post("/create" ,
     // checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
     multerUpload.array("files"),
-    validateDivision(tourValidationSchema),
+    validateTour(tourValidationSchema),
     TourController.TourCreate
 )
 
@@ -29,8 +30,9 @@ router.get("/", TourController.getAlltour)
 router.get("/:id" , TourController.GetSingleTour)
 
 router.patch("/:id" ,
-    checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
-    validateDivision(updateTourValidationSchema), 
+    // checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
+    multerUpload.array("files"),
+    validateTour(updateTourValidationSchema), 
     TourController.UpdateTour)
 
 router.delete("/:id" ,checkAuth(Role.ADMIN , Role.SUPER_ADMIN), TourController.DeleteTour)

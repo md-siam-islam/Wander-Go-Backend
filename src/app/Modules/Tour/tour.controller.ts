@@ -124,23 +124,25 @@ const GetSingleTour = catchAsync(async (req:Request , res:Response, next:NextFun
     })
 })
 
-const UpdateTour = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
-    const {id} = req.params
 
-    const payload = {
+
+const UpdateTour = catchAsync(async (req: Request, res: Response) => {
+
+    console.log("Files in controller:", req);
+
+    const payload: ITour = {
         ...req.body,
-        images : (req.files as Express.Multer.File[]).map(file => file.path)
+        images: (req.files as Express.Multer.File[]).map(file => file.path)
     }
-
-    const Tour = await TourServices.UpdateTour(id , payload)
-
-    Sendresponse(res,{
-        success : true,
+    const result = await TourServices.UpdateTour(req.params.id, payload);
+    Sendresponse(res, {
+         success : true,
         statuscode : httpStatus.OK,
         message : "Tour Updated Successfully",
-        data : Tour
-    })
-})
+        data : result
+    });
+});
+
 
 const DeleteTour = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
     const {id} = req.params
