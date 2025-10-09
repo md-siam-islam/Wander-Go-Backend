@@ -12,3 +12,6 @@ export const catchAsync = (fn:Asynchandler) => (req:Request , res:Response,next:
         next(err)
     })
 }
+
+
+

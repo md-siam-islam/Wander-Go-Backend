@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import { User } from "../User/user.model";
 import { IAuthprovider, IUser, Role } from "../User/user.interface";
 import { envVariables } from "../../config/env";
+import { Types } from "mongoose";
 
 export const seedSuperAdmin = async () => {
   try {
@@ -26,6 +27,7 @@ export const seedSuperAdmin = async () => {
     };
 
     const payload: IUser = {
+      _id: new Types.ObjectId(),
       name: "Super Admin",
       email: superAdminEmail ,
       password: hashedPassword,

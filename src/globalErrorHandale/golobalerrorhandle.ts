@@ -22,6 +22,8 @@ export const globalErrorHandle = async ( error : any, req:Request , res: Respons
         })
     )};
 
+    
+
 if (error.name === "CastError") {
     return res.status(400).json({
       success: false,
