@@ -54,7 +54,7 @@ if(error.name === "ZodError"){
         })
  }
 
-     // Custom error (service থেকে throw করা হয়েছে)
+
     if (error.statusCode) {
         return res.status(error.statusCode).json({
             success: false,

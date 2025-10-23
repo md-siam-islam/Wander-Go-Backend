@@ -13,6 +13,7 @@ import passport from 'passport';
 
 
 // const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
 //     const user = await AuthServices.CredentialLogin(req.body)
 
 //     setCookiesAccessTokenwithRefreshToken(res,user)
@@ -108,8 +109,6 @@ const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextF
     }
     
     const decodedUser = req.user;
-
-    
 
     await AuthServices.UserResetPassword( oldPassword,newPassword , decodedUser as JwtPayload);
 

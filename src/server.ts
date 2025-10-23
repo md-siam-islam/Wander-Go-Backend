@@ -37,7 +37,6 @@ process.on("SIGTERM" , () => {
             process.exit(1)
         })
     }
-
     process.exit(1)
 })
 

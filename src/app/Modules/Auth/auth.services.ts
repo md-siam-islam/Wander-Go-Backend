@@ -15,6 +15,7 @@ import { JwtAccessToken } from "../utils/userAccessToken";
 //     if (!user) {
 //         throw new Error("User not found from CredentialLogin");
 //     }
+
 //     // Check password
 //     const isMatch = await bcryptjs.compare(password as string, user.password as string);
 
@@ -22,7 +23,7 @@ import { JwtAccessToken } from "../utils/userAccessToken";
 //         throw new Error("Invalid credentials");
 //     }
 
-//     const userAssesToken = JwtAccessToken(user)
+    // const userAssesToken = JwtAccessToken(user)
 
 //     const {password: pas , ...rest} = user.toObject();
 
