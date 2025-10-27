@@ -40,6 +40,12 @@ interface envarInterface {
         SMTP_USER: string,
         SMTP_PASS: string,
         SMTP_FROM_EMAIL: string
+    },
+    REDIS: {
+        REDIS_HOST: string,
+        REDIS_PORT: string,
+        REDIS_PASSWORD: string,
+        REDIS_USERNAME: string
     }
 
 }
@@ -51,7 +57,9 @@ const envloader = (): envarInterface => {
         "SSL_SUCCESS_FRONTEND_URL",
         "SSL_FAIL_FRONTEND_URL",
         "SSL_CANCEL_FRONTEND_URL",
-    "CLOUDINARY_CLOUD_NAME","CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
+    "CLOUDINARY_CLOUD_NAME","CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET", "SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM_EMAIL",
+    "REDIS_HOST", "REDIS_PORT", "REDIS_PASSWORD", "REDIS_USERNAME"
+    ];
 
     requiredEnv.forEach((env) => {
         if (!process.env[env]) {
@@ -97,8 +105,14 @@ const envloader = (): envarInterface => {
             SMTP_USER: process.env.SMTP_USER as string,
             SMTP_PASS: process.env.SMTP_PASS as string,
             SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL as string
+            },
+            REDIS: {
+                REDIS_HOST: process.env.REDIS_HOST as string,
+                REDIS_PORT: process.env.REDIS_PORT as string,
+                REDIS_PASSWORD: process.env.REDIS_PASSWORD as string,
+                REDIS_USERNAME: process.env.REDIS_USERNAME as string
             }
-}
+            }
 
 }
 
