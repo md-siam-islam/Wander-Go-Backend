@@ -97,6 +97,24 @@ const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunc
 });
 
 
+const ForgotPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+      const email = req.body.email;
+
+      if(!email){
+        return next(new Error("Email is required"));
+      }
+
+     await AuthServices.ForgotPassword(email);
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Email Sent Successfull",
+        data: null
+    });
+});
+
 const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
         const oldPassword = req.body.oldPassword;
@@ -146,5 +164,6 @@ export const AuthController = {
     RefreshToken,
     LogoutUser,
     ResetPassword,
-    GoogleAuthCallback
+    GoogleAuthCallback,
+    ForgotPassword
 }
