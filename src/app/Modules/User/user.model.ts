@@ -31,7 +31,7 @@ const userSchema = new Schema <IUser> ({
         default : IsActive.ACTIVE
     },
 
-    isVerified : {type : Boolean , default: false},
+    isVerified : {type : Boolean , default: true},
     auth : [AuthSchema]
 
 },{

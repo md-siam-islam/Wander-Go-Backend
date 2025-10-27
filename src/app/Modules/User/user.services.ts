@@ -72,7 +72,7 @@ const UpdateUser = async(userId : string , payload : Partial<IUser> , decodedTok
 
 const AllUser = async () => {
 
-    const user = await User.find({})
+    const user = await User.find({}).select('-password -auth -isDeleted -createdAt -updatedAt');
     const totalUser = await User.countDocuments() 
 
     return {
@@ -84,7 +84,7 @@ const AllUser = async () => {
 }
 const GetMyProfile = async (decodedToken: JwtPayload) => {
 
-    const user = await User.findById(decodedToken.userId)
+    const user = await User.findById(decodedToken.userId).select('-password -auth -isDeleted -createdAt -updatedAt');
 
     return {
         data : user

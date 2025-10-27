@@ -15,3 +15,6 @@ router.get("/me" , checkAuth(...Object.values(Role)), UserController.GetMyProfil
 router.patch('/:id',validateUser(updateUserZoodSchema), checkAuth(...Object.values(Role)), UserController.UpdateUser)
 
 export const UserRoutes = router
+
+
+// user ar reset password ar kaj ta holo frist a user jokhon reset password a click korbe and then tar samne akta form asbe jekhane se tar email dibo. tarpor sei email a akta link chole jabe. oi email a akta button thake oi button ta link thake frontend ar akta router ar shate like a httphttp://localhost:5173/email=""? token  jodi user oi link a click kore tahole se notun password set korte parbe.
