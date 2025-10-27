@@ -82,9 +82,19 @@ const AllUser = async () => {
         }
     }
 }
+const GetMyProfile = async (decodedToken: JwtPayload) => {
+
+    const user = await User.findById(decodedToken.userId)
+
+    return {
+        data : user
+    }
+}
+
 
 export const UserServices = {
     Createuser,
     AllUser,
-    UpdateUser
+    UpdateUser,
+    GetMyProfile
 }

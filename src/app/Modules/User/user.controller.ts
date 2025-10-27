@@ -51,8 +51,23 @@ const AllUser = catchAsync( async (req:Request , res:Response,next:NextFunction)
 
             })
 })
+const GetMyProfile = catchAsync( async (req:Request , res:Response,next:NextFunction) => {
+
+        const decodedToken = req.user as JwtPayload;
+
+
+         const result = await UserServices.GetMyProfile(decodedToken)
+         
+          Sendresponse(res,{
+            success : true,
+            statuscode : httpStatus.OK,
+            message : "Your profile fetched successfully",
+            data : result.data,
+
+            })
+})
 
 export const  UserController = {
-        CreateUser , AllUser , UpdateUser
+        CreateUser , AllUser , UpdateUser , GetMyProfile
 }
 
