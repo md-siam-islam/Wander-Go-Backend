@@ -116,19 +116,10 @@ const ForgotPassword = catchAsync(async (req: Request, res: Response, next: Next
 });
 
 const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
-        const oldPassword = req.body.oldPassword;
-        const newPassword = req.body.newPassword;
-
-    console.log(oldPassword, newPassword);
-
-    if (!oldPassword || !newPassword) {
-        return next(new Error("Old password and new password are required"));
-    }
     
     const decodedUser = req.user;
 
-    await AuthServices.UserResetPassword( oldPassword,newPassword , decodedUser as JwtPayload);
+    await AuthServices.UserResetPassword(req.body, decodedUser as JwtPayload);
 
 
     Sendresponse(res, {

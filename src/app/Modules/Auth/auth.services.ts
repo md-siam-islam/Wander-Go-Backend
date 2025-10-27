@@ -117,31 +117,30 @@ const ForgotPassword = async (email: string) => {
 
 }
 
-// http://localhost:5173/reset-password?id=68ff6987ecbf54978fe63027&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGZmNjk4N2VjYmY1NDk3OGZlNjMwMjciLCJlbWFpbCI6Im1kc2lhbWlzbGFtNjY2M0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2MTU2OTQ1OSwiZXhwIjoxNzYxNTcwMDU5fQ.jiQt-xEui5WNtFzE3j-Duk-qvVnBS9g1cT124feo_E8
+// http://localhost:5173/reset-password?id=68ff6987ecbf54978fe63027&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGZmNjk4N2VjYmY1NDk3OGZlNjMwMjciLCJlbWFpbCI6Im1kc2lhbWlzbGFtNjY2M0BnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc2MTU3MDEzMiwiZXhwIjoxNzYxNTcwNzMyfQ.4pZq1Wsv1vQ7OrhrjUGLZKDzEdIwo9SGP-3nonHclAs
 
 
-const UserResetPassword = async (oldPassword: string, newPassword: string, decodedUser: JwtPayload) => {
+const UserResetPassword = async (payload:Record<string,any>, decodedUser: JwtPayload) => {
 
-    const user = await User.findById(decodedUser.userId);
 
-    if (!user) {
-        throw new Error("User not found from UserResetPassword");
+    if (payload.id != decodedUser.userId) {
+        throw new Error("You can not reset your password")
     }
 
-    const isMatch = await bcryptjs.compare(oldPassword, user.password as string);
-
-    if (!isMatch) {
-        throw new Error("Old password is incorrect");
+    const isUserExist = await User.findById(decodedUser.userId)
+    if (!isUserExist) {
+        throw new Error("User does not exist")
     }
 
-    user.password = await bcryptjs.hash(newPassword, Number(envVariables.BCRYPT_SALT_ROUNDS));
+    const hashedPassword = await bcryptjs.hash(
+        payload.newPassword,
+        Number(envVariables.BCRYPT_SALT_ROUNDS)
+    )
 
-    await user.save();
+    isUserExist.password = hashedPassword;
 
-    return {
-        success: true,
-        message: "Password reset successful"
-    };
+    await isUserExist.save();
+
 }
 
 export const AuthServices = {
