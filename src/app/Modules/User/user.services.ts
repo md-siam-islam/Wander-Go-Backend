@@ -97,10 +97,22 @@ const GetMyProfile = async (decodedToken: JwtPayload) => {
     }
 }
 
+const getSingleUser = async (userId : string) => {
+
+    const user = await User.findById(userId).select('-password -auth -isDeleted -createdAt -updatedAt');       
+
+    if(!user){
+        throw new Error("User not found from getSingleUser");
+    }
+
+    return user
+}
+
 
 export const UserServices = {
     Createuser,
     AllUser,
     UpdateUser,
-    GetMyProfile
+    GetMyProfile,
+    getSingleUser
 }

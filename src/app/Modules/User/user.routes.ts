@@ -12,6 +12,7 @@ router.post('/register'
     ,UserController.CreateUser)
 router.get("/all-users" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.AllUser )
 router.get("/me" , checkAuth(...Object.values(Role)), UserController.GetMyProfile )
+router.get('/:id',checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.getSingleUser)
 router.patch('/:id',validateUser(updateUserZoodSchema), checkAuth(...Object.values(Role)), UserController.UpdateUser)
 
 export const UserRoutes = router
