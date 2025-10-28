@@ -26,12 +26,10 @@ app.use(express.urlencoded({extended : true}))
 app.use(cookieParser())
 app.use(cors())
 
-app.use(
-  cors({
+app.use(cors({
     origin: envVariables.FRONTEND_URL,
     credentials: true,
-   })
-);
+}));
 
 app.use("/api/v1" , router)
 

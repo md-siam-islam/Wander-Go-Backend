@@ -6,6 +6,7 @@ import { TourRoutes } from '../Modules/Tour/tour.routes';
 import { BookingRoutes } from '../Modules/Booking/booking.routes';
 import { PaymentRoutes } from '../Modules/Payment/payment.route';
 import { OtpRoutes } from '../Modules/Otp/otp.route';
+import { StatsRoutes } from '../Modules/Stats/stats.route';
 
 
 export const router = express.Router()
@@ -39,6 +40,10 @@ const RouterModule = [
     {
         path: "/otp",
         route: OtpRoutes
+    },
+    {
+        path: "/stats",
+        route: StatsRoutes
     }
 ]
 
