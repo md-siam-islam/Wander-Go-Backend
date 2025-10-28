@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import { redisClient } from '../../config/redis.config';
 import { sendMailer } from '../utils/emailSener';
+import { User } from '../User/user.model';
+import { promise } from 'zod';
 
 const OTP_EXPIRY_TIME = 2 * 60; // 2 minutes in seconds
 
@@ -11,6 +13,16 @@ const generateOTP = (length = 6) => {
   
 
 const sendOTP = async (email : string , name : string) => {
+
+    const user = await User.findOne({ email });
+
+    if(!user){
+        throw new Error('User not found');
+    }
+
+    if(user.isVerified){
+        throw new Error('User is already verified');
+    }
 
     const otp = generateOTP();
 
@@ -35,6 +47,33 @@ const sendOTP = async (email : string , name : string) => {
     
 }
 
+const verifyOTP = async (email: string, otp: string) => {
+
+    const user = await User.findOne({ email });
+
+    if(!user){
+        throw new Error('User not found');
+    }
+
+    if(user.isVerified){
+        throw new Error('User is already verified');
+    }
+
+    const radisKey = `otp:${email}`;
+
+    const storedOtp = await redisClient.get(radisKey);
+
+    if (storedOtp !== otp) {
+        throw new Error('Invalid OTP');
+    }
+
+   await Promise.all([
+      User.updateOne({ email }, { isVerified: true } , {runValidators : true}),
+      redisClient.del([radisKey])
+   ]);
+}
+
 export const OtpService = {
-    sendOTP
+    sendOTP,
+    verifyOTP
 };
