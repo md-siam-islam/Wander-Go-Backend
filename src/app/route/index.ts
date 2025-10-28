@@ -5,6 +5,7 @@ import { DivisionRoutes } from '../Modules/Division/division.route';
 import { TourRoutes } from '../Modules/Tour/tour.routes';
 import { BookingRoutes } from '../Modules/Booking/booking.routes';
 import { PaymentRoutes } from '../Modules/Payment/payment.route';
+import { OtpRoutes } from '../Modules/Otp/otp.route';
 
 
 export const router = express.Router()
@@ -34,6 +35,10 @@ const RouterModule = [
     {
         path: "/payment",
         route : PaymentRoutes
+    },
+    {
+        path: "/otp",
+        route: OtpRoutes
     }
 ]
 
