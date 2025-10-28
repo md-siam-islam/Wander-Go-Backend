@@ -106,17 +106,5 @@ phone: z
     message: "Phone number must be a valid Bangladeshi number",
   })
     .optional(),
-    
-    password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .max(100, { message: "Password must be less than 100 characters" })
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@#$%]{8,}$/,
-      {
-        message:
-          "Password must include uppercase, lowercase, number, and special character",
-      }
-    ).optional()
-
-    
+      
 })
