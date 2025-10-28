@@ -6,6 +6,7 @@ import { createToken } from "../utils/jwt";
 import { envVariables } from "../../config/env";
 import { JwtAccessToken } from "../utils/userAccessToken";
 import { sendMailer } from "../utils/emailSener";
+import { decode } from "punycode";
 
 
 // const CredentialLogin = async (payload : Partial<IUser>) => {
@@ -73,6 +74,28 @@ const generateRefreshToken = async (refreshToken: string) => {
     };
 }
 
+const changePassword = async (decodedUser: JwtPayload, payload: Record<string, any>) => {
+
+    const isUserExist = await User.findById(decodedUser.userId);
+
+    if (!isUserExist) {
+        throw new Error("User not found");
+    }
+
+    const { oldPassword, newPassword } = payload;
+
+    const isMatch = await bcryptjs.compare(oldPassword, isUserExist.password as string);
+
+    if (!isMatch) {
+        throw new Error("Old password is incorrect");
+    }
+
+    const hashedPassword = await bcryptjs.hash(newPassword, Number(envVariables.BCRYPT_SALT_ROUNDS));
+
+    isUserExist.password = hashedPassword;
+
+    await isUserExist.save();
+}
 
 const ForgotPassword = async (email: string) => {
 
@@ -147,5 +170,6 @@ export const AuthServices = {
     // CredentialLogin,
     generateRefreshToken,
     UserResetPassword,
-    ForgotPassword
+    ForgotPassword,
+    changePassword
 };
