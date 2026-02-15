@@ -22,10 +22,10 @@ export interface IUser {
     _id :Types.ObjectId;
     name : string ;
     email : string ;
-    phone ? : string ;
+    phone : string ;
     password ? : string ;
     picture ? : string ;
-    address ? : string ;
+    address : string ;
     isDeleted ? : string ;
     isActive ?: IsActive ;
     isVerified ?: boolean ;

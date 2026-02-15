@@ -10,6 +10,12 @@ const Createuser = async (payload: Partial<IUser>) => {
 
     const { email,password, ...rest } = payload
 
+    const isUserExist = await User.findOne({ email });
+
+   if (isUserExist) {
+     throw new Error(" This Email User already exists");
+   }
+
     // const emailExists = await User.findOne({ email });
 
 //    if (emailExists) {

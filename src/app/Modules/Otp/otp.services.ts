@@ -3,24 +3,28 @@ import { redisClient } from '../../config/redis.config';
 import { sendMailer } from '../utils/emailSener';
 import { User } from '../User/user.model';
 import { promise } from 'zod';
+import { JwtAccessToken } from '../utils/userAccessToken';
+import { setCookiesAccessTokenwithRefreshToken } from '../utils/setCookies';
 
 const OTP_EXPIRY_TIME = 2 * 60; // 2 minutes in seconds
 
 const generateOTP = (length = 6) => {
-    const otp = crypto.randomInt(10**(length - 1), 10**length).toString()
+    const otp = crypto.randomInt(10 ** (length - 1), 10 ** length).toString()
     return otp;
 }
-  
 
-const sendOTP = async (email : string , name : string) => {
+
+const sendOTP = async (email: string) => {
 
     const user = await User.findOne({ email });
 
-    if(!user){
+    const name = user?.name
+
+    if (!user) {
         throw new Error('User not found');
     }
 
-    if(user.isVerified){
+    if (user.isVerified) {
         throw new Error('User is already verified');
     }
 
@@ -28,12 +32,12 @@ const sendOTP = async (email : string , name : string) => {
 
     const radisKey = `otp:${email}`;
 
-    await redisClient.set(radisKey, otp ,{ 
+    await redisClient.set(radisKey, otp, {
         expiration: {
-            type : 'EX',
-            value : OTP_EXPIRY_TIME
+            type: 'EX',
+            value: OTP_EXPIRY_TIME
         }
-    }) 
+    })
 
     await sendMailer({
         to: email,
@@ -41,21 +45,21 @@ const sendOTP = async (email : string , name : string) => {
         templateName: "otp",
         templateData: {
             name: name,
-            otp : otp,
+            otp: otp,
         }
     })
-    
+
 }
 
 const verifyOTP = async (email: string, otp: string) => {
 
     const user = await User.findOne({ email });
 
-    if(!user){
+    if (!user) {
         throw new Error('User not found');
     }
 
-    if(user.isVerified){
+    if (user.isVerified) {
         throw new Error('User is already verified');
     }
 
@@ -67,10 +71,15 @@ const verifyOTP = async (email: string, otp: string) => {
         throw new Error('Invalid OTP');
     }
 
-   await Promise.all([
-      User.updateOne({ email }, { isVerified: true } , {runValidators : true}),
-      redisClient.del([radisKey])
-   ]);
+    await Promise.all([
+        User.updateOne({ email }, { isVerified: true }, { runValidators: true }),
+        redisClient.del([radisKey])
+    ]);
+
+    const tokenInfo = JwtAccessToken(user);
+    
+    return tokenInfo;
+
 }
 
 export const OtpService = {

@@ -9,7 +9,7 @@ export const checkAuth = (...role: string[]) => async (req: Request, res: Respon
     try {
 
 
-        const authHeader = req.headers.authorization;
+        const authHeader = req.headers.authorization || req.cookies.accessToken;
 
         if (!authHeader) {
             throw new Error("No token provided from checkAuth");

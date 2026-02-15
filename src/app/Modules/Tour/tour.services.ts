@@ -10,11 +10,11 @@ import { deleteImageFromCloudinary } from "../../config/cloudinary.config"
 //----- Tour Type Services starts -----//
 const CreateTourtype = async (payload: ITourtype) => {
     // Implementation for creating a tour
-    // const Existour = await TourType.findOne({name: payload.name}) 
+    const Existour = await TourType.findOne({name: payload.name}) 
 
-    // if(Existour){
-    //     throw new Error("Tour Type already exists")
-    // }
+    if(Existour){
+        throw new Error("Tour Type already exists")
+    }
 
     const tourtype = await TourType.create(payload)
 

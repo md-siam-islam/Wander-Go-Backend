@@ -15,6 +15,7 @@ const initPayment = async (bookingId : string) => {
     }
 
     const booking = await Booking.findById(payment.booking)
+.populate("user")
 
         const Name = (booking?.user as any).name
         const Email = (booking?.user as any).email

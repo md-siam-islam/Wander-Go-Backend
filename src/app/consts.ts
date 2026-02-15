@@ -1,1 +1,1 @@
-export const deleteFields = ["searchTerm" , "sort", "field", "page", "limit", "skip"]
+export const deleteFields = ["searchTerm" , "sort", "field", "page", "limit", "skip" , "minPrice" , "maxPrice"];

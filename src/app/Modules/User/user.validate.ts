@@ -106,5 +106,9 @@ phone: z
     message: "Phone number must be a valid Bangladeshi number",
   })
     .optional(),
+
+address: z.string().optional(),
+
+picture: z.string().optional(),
       
 })

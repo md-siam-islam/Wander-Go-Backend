@@ -3,12 +3,13 @@ import { NextFunction, Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import { OtpService } from "./otp.services";
 import { Sendresponse } from "../utils/sendResponse";
+import { setCookiesAccessTokenwithRefreshToken } from '../utils/setCookies';
 
 const sendOtp = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const { email , name } = req.body;
+    const { email } = req.body;
 
-    await OtpService.sendOTP(email , name);
+    await OtpService.sendOTP(email);
 
      Sendresponse(res,{
         success : true,
@@ -22,13 +23,16 @@ const sendOtp = catchAsync(async (req:Request , res:Response, next:NextFunction)
 const verifyOTP = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
     const { email , otp } = req.body;
 
-    await OtpService.verifyOTP(email , otp);
+    // await OtpService.verifyOTP(email , otp);
+    const tokenInfo = await OtpService.verifyOTP(email, otp);
 
-         Sendresponse(res,{
+    setCookiesAccessTokenwithRefreshToken(res, tokenInfo)
+
+        Sendresponse(res,{
         success : true,
         statuscode : httpStatus.OK,
         message : "OTP verified successfully",
-        data : null
+        data : tokenInfo
     })
 })
 

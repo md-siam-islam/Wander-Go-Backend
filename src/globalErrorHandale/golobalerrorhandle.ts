@@ -64,7 +64,7 @@ if(error.name === "ZodError"){
 
     res.status(500).json({
         success : false,
-        message : `Somthing went wrong !!! 😒😒 ${error.message} . Error Form Global Erroe`,
+        message : `${error.message}`,
         error : envVariables.NODE_ENV === "development" ? error : null,
         stack : envVariables.NODE_ENV === "development" ? error.stack : null,
     })

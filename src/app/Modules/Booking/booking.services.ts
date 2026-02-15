@@ -17,6 +17,7 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     const transactionId = getTransactionId()
 
     const session = await Booking.startSession()
+    
     session.startTransaction()
 
     try {
@@ -24,6 +25,10 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
 
     if(!user){
         throw new Error("user not Found . Error BY Booking Servces")
+    }
+
+    if(!user.phone && !user.address){
+        throw new Error("Please Update Your Profile Provide phone and address")
     }
 
     const tour =  await Tour.findById(payload.tour).select("costFrom")
@@ -68,6 +73,8 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     }
 
     const sslPaymentGetway = await SSLservices.sslPayment(sslArgument)
+    
+    console.log("SSL RESPONSE =", sslPaymentGetway)
 
     await session.commitTransaction()
     session.endSession()
@@ -84,6 +91,8 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     }
     
 }
+
+
 
 const getAllbooking = async () => {
 

@@ -16,7 +16,10 @@ const CreateBooking = catchAsync(async (req:Request, res:Response, next:NextFunc
         success : true,
         statuscode : httpStatus.OK,
         message : "Booking Created Successfully",
-        data :  Booking
+        data: {
+            bookingDetails: Booking.BookingDetails,
+            paymentUrl: Booking.paymentUrl || "Payment URL not found"
+        }
     })
 })
 

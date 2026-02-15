@@ -11,10 +11,22 @@ export class QueryBuilder<T> {
     }
 
     filter() : this {
-        const filter = { ...this.query }
+        const filter: Record<string, any> = { ...this.query };
         // delete unwanted fields from filter object
          for(const field of deleteFields){
         delete filter[field]
+
+        if(this.query.minPrice || this.query.maxPrice){
+
+            filter.costFrom = {}
+
+            if(this.query.minPrice){
+                filter.costFrom.$gte = Number(this.query.minPrice)
+            }
+            if(this.query.maxPrice){
+                filter.costFrom.$lte = Number(this.query.maxPrice)
+            }
+        }
     }
     this.modelQuery = this.modelQuery.find(filter)
 
@@ -47,7 +59,7 @@ field() : this {
 }
 pagination() : this {
     const page = Number(this.query.page) || 1
-    const limit = Number(this.query.limit) || 10
+    const limit = Number(this.query.limit) || 9
     const skip = (page - 1) * limit
 
     this.modelQuery = this.modelQuery.skip(skip).limit(limit);

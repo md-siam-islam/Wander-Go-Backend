@@ -26,38 +26,42 @@ import passport from 'passport';
 //     })
 // })
 
-const LoginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const LoginUser  = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // const user = await AuthServices.CredentialLogin(req.body)
-    passport.authenticate("local" , async (err:any , user:any , info:any ) => {
+    passport.authenticate("local", async (err: any, user: any, info: any) => {
 
 
-        if(err){
+        if (err) {
             return next(err);
         }
 
-        if(!user){
+        if (!user) {
             return next(new Error(info.message || "Authentication failed  38"));
+        }
+
+        if (!user.isVerified) {
+            return next(new Error("Your account is not verified"));
         }
 
         const tokenInfo = JwtAccessToken(user);
 
-        setCookiesAccessTokenwithRefreshToken(res,tokenInfo)
+        setCookiesAccessTokenwithRefreshToken(res, tokenInfo)
 
-        const {password, ...userWithoutPassword} = user.toObject();
+        const { password, ...userWithoutPassword } = user.toObject();
 
-        Sendresponse(res, { 
-        success: true,
-        statuscode: httpStatus.OK,
-        message: "User Login Successfull",
-        accessToken: tokenInfo.accessToken,
-        refreshToken: tokenInfo.refreshToken,
-        data: userWithoutPassword
-    })
+        Sendresponse(res, {
+            success: true,
+            statuscode: httpStatus.OK,
+            message: "User Login Successfull",
+            accessToken: tokenInfo.accessToken,
+            refreshToken: tokenInfo.refreshToken,
+            data: userWithoutPassword
+        })
 
 
-    })(req,res,next)
+    })(req, res, next)
 
-    
+
 })
 
 const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -76,7 +80,7 @@ const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
 });
 
 const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    
+
     res.clearCookie("accessToken", {
         httpOnly: true,
         secure: false,
@@ -112,13 +116,13 @@ const changePassword = catchAsync(async (req: Request, res: Response, next: Next
 
 const ForgotPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-      const email = req.body.email;
+    const email = req.body.email;
 
-      if(!email){
+    if (!email) {
         return next(new Error("Email is required"));
-      }
+    }
 
-     await AuthServices.ForgotPassword(email);
+    await AuthServices.ForgotPassword(email);
 
     Sendresponse(res, {
         success: true,
@@ -146,15 +150,15 @@ const ResetPassword = catchAsync(async (req: Request, res: Response, next: NextF
 
 const GoogleAuthCallback = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-     const user = req.user;
+    const user = req.user;
 
-     console.log("Google Auth Callback User:", user);
+    console.log("Google Auth Callback User:", user);
 
-     if(!user) {
-        return next(new Error("User not found")); 
-     }
+    if (!user) {
+        return next(new Error("User not found"));
+    }
 
-     const tokenInfo = JwtAccessToken(user)
+    const tokenInfo = JwtAccessToken(user)
     setCookiesAccessTokenwithRefreshToken(res, tokenInfo);
 
     res.redirect(envVariables.FRONTEND_URL);
