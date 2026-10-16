@@ -26,6 +26,19 @@ const bookingSchema = new Schema<IBooking>({
         type : String,
         enum : Object.values(BOOKING_ENUM),
         default : BOOKING_ENUM.PENDING
+    },
+    couponCode: {
+        type: String,
+    },
+    discountAmount: {
+        type: Number,
+        default: 0,
+    },
+    originalAmount: {
+        type: Number,
+    },
+    totalAmount: {
+        type: Number,
     }
 
 } , {

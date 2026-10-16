@@ -20,6 +20,7 @@ exports.tourValidationSchema = zod_1.z.object({
     arrivalLocation: zod_1.z.string().optional(),
     division: zod_1.z.string().min(1, "Division is required"),
     tourType: zod_1.z.string().min(1, "TourType is required"),
+    guides: zod_1.z.array(zod_1.z.string()).optional(),
 });
 exports.updateTourValidationSchema = zod_1.z.object({
     title: zod_1.z.string().optional(),
@@ -40,5 +41,6 @@ exports.updateTourValidationSchema = zod_1.z.object({
     arrivalLocation: zod_1.z.string().optional(),
     images: zod_1.z.array(zod_1.z.string()).default([]).optional(),
     deletedImages: zod_1.z.array(zod_1.z.string()).optional(),
-    deleteImages: zod_1.z.array(zod_1.z.string()).optional()
+    deleteImages: zod_1.z.array(zod_1.z.string()).optional(),
+    guides: zod_1.z.array(zod_1.z.string()).optional()
 });

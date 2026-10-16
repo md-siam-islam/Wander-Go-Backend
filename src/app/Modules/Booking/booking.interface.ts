@@ -16,5 +16,9 @@ export interface IBooking {
     tour : Types.ObjectId,
     payment? : Types.ObjectId,
     guestCount : number,
-    status : BOOKING_ENUM
+    status : BOOKING_ENUM,
+    couponCode?: string,
+    discountAmount?: number,
+    originalAmount?: number,
+    totalAmount?: number
 }

@@ -9,6 +9,11 @@ import { OtpRoutes } from '../Modules/Otp/otp.route';
 import { StatsRoutes } from '../Modules/Stats/stats.route';
 
 
+import { ReviewRoutes } from '../Modules/Review/review.route';
+import { WishlistRoutes } from '../Modules/Wishlist/wishlist.route';
+import { CouponRoutes } from '../Modules/Coupon/coupon.route';
+
+
 export const router = express.Router()
 
 const RouterModule = [
@@ -44,6 +49,18 @@ const RouterModule = [
     {
         path: "/stats",
         route: StatsRoutes
+    },
+    {
+        path: "/review",
+        route: ReviewRoutes
+    },
+    {
+        path: "/wishlist",
+        route: WishlistRoutes
+    },
+    {
+        path: "/coupon",
+        route: CouponRoutes
     }
 ]
 

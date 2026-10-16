@@ -76,14 +76,13 @@ const CreateTour = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     return tour;
 });
 const getAllTour = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const modelQuery = new QueryBulder_1.QueryBuilder(tour_model_1.Tour.find(), query);
+    const modelQuery = new QueryBulder_1.QueryBuilder(tour_model_1.Tour.find().populate("division", "name slug image").populate("tourType", "name").populate("guides", "name email phone picture"), query);
     const Tours = yield modelQuery.
         search(tour_searchfield_1.searchField).
         filter().
         sort().
         field().
         pagination();
-    // const metaData = await modelQuery.Getmeta()
     const [data, meta] = yield Promise.all([
         Tours.build(),
         modelQuery.Getmeta()
@@ -93,39 +92,14 @@ const getAllTour = (query) => __awaiter(void 0, void 0, void 0, function* () {
         meta
     };
 });
-// const getAllTour = async (query: Record<string, string>) => {
-//     const filter = query
-//     const searchTerm = query.searchTerm || ""
-//     const sort = query.sort || "-createdAt"
-//     const field = query.field?.split(",").join(" ") || ""
-//     const page = Number(query.page) || 1
-//     const limit = Number(query.limit) || 10
-//     const skip = (page - 1) * limit
-//     delete unwanted fields from filter object
-//     for(const field of deleteFields){
-//         delete filter[field]
-//     }
-//     const SearchQuery = { $or : searchField.map(field => ({
-//         [field] : {$regex : searchTerm , $options : "i"}
-//     }))}
-//     const tour = await Tour.find(SearchQuery).find(filter).sort(sort).select(field).skip(skip).limit(limit)
-//     const totalTour = await Tour.countDocuments()
-//     return {
-//         meta: {
-//             page: page,
-//             limit: limit,
-//             total: totalTour,
-//             totalPage : Math.ceil(totalTour/limit)
-//         },
-//         data: tour
-//     }
-// }
 const GetSingleTour = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingTour = yield tour_model_1.Tour.findById(id);
-    if (!existingTour) {
+    const tour = yield tour_model_1.Tour.findById(id)
+        .populate("division", "name slug image")
+        .populate("tourType", "name")
+        .populate("guides", "name email phone picture");
+    if (!tour) {
         throw new Error("Tour not found");
     }
-    const tour = yield tour_model_1.Tour.findById(id);
     return tour;
 });
 const UpdateTour = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {

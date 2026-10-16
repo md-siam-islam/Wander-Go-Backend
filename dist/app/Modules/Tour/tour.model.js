@@ -28,7 +28,10 @@ const TourSchema = new mongoose_1.Schema({
     arrivalLocation: { type: String },
     division: { type: mongoose_1.Schema.Types.ObjectId, ref: "Division", required: true },
     tourType: { type: mongoose_1.Schema.Types.ObjectId, ref: "TourType", required: true },
-    deletedImages: { type: [String], default: [] }
+    deletedImages: { type: [String], default: [] },
+    averageRating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+    guides: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "User", default: [] }]
 }, {
     timestamps: true
 });

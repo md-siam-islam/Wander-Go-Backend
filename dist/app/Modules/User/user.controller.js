@@ -29,7 +29,7 @@ const CreateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
 }));
 // user get function
 const AllUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_services_1.UserServices.AllUser();
+    const result = yield user_services_1.UserServices.AllUser(req.query);
     (0, sendResponse_1.Sendresponse)(res, {
         success: true,
         statuscode: http_status_codes_1.default.OK,
@@ -62,7 +62,7 @@ const UpdateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
     const UserId = req.params.id;
     const payload = req.body;
     const VerifyToken = req.user;
-    const user = user_services_1.UserServices.UpdateUser(UserId, payload, VerifyToken);
+    const user = yield user_services_1.UserServices.UpdateUser(UserId, payload, VerifyToken);
     (0, sendResponse_1.Sendresponse)(res, {
         success: true,
         statuscode: http_status_codes_1.default.OK,
@@ -70,6 +70,26 @@ const UpdateUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(vo
         data: user
     });
 }));
+const getAllGuides = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const guides = yield user_services_1.UserServices.getAllGuides();
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Guides retrieved successfully",
+        data: guides,
+    });
+}));
+const deleteUser = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.params.id;
+    const decodedUser = req.user;
+    const result = yield user_services_1.UserServices.deleteUser(userId, decodedUser);
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "User deleted successfully",
+        data: result,
+    });
+}));
 exports.UserController = {
-    CreateUser, AllUser, UpdateUser, GetMyProfile, getSingleUser
+    CreateUser, AllUser, UpdateUser, GetMyProfile, getSingleUser, getAllGuides, deleteUser
 };

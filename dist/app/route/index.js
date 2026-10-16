@@ -13,6 +13,9 @@ const booking_routes_1 = require("../Modules/Booking/booking.routes");
 const payment_route_1 = require("../Modules/Payment/payment.route");
 const otp_route_1 = require("../Modules/Otp/otp.route");
 const stats_route_1 = require("../Modules/Stats/stats.route");
+const review_route_1 = require("../Modules/Review/review.route");
+const wishlist_route_1 = require("../Modules/Wishlist/wishlist.route");
+const coupon_route_1 = require("../Modules/Coupon/coupon.route");
 exports.router = express_1.default.Router();
 const RouterModule = [
     {
@@ -46,6 +49,18 @@ const RouterModule = [
     {
         path: "/stats",
         route: stats_route_1.StatsRoutes
+    },
+    {
+        path: "/review",
+        route: review_route_1.ReviewRoutes
+    },
+    {
+        path: "/wishlist",
+        route: wishlist_route_1.WishlistRoutes
+    },
+    {
+        path: "/coupon",
+        route: coupon_route_1.CouponRoutes
     }
 ];
 RouterModule.forEach((route) => {

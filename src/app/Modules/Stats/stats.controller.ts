@@ -29,7 +29,31 @@ const getDashboardStats = catchAsync(async (req:Request , res: Response , next: 
     })
 });
 
+const getMonthlyAnalytics = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const stats = await StatsService.getMonthlyAnalytics();
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Monthly analytics fetched successfully",
+        data: stats,
+    });
+});
+
+const getTourDistributionStats = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const stats = await StatsService.getTourDistributionStats();
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Tour distribution stats fetched successfully",
+        data: stats,
+    });
+});
+
 export const StatsController = {
     getUserStats,
-    getDashboardStats
+    getDashboardStats,
+    getMonthlyAnalytics,
+    getTourDistributionStats
 };

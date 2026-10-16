@@ -73,6 +73,7 @@ class QueryBuilder {
             const limit = Number(this.query.limit) || 10;
             const totalPage = Math.ceil(totalDocument / limit);
             return {
+                total: totalDocument,
                 totalDocument,
                 page,
                 limit,

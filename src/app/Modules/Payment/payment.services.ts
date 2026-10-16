@@ -159,9 +159,62 @@ const cancelPayment = async (query : Record<string, string>, body?: any) =>{
         throw error
     }
 }
+import { QueryBuilder } from "../utils/QueryBulder";
+
+const getAllPayments = async (query: Record<string, string>) => {
+    const paymentSearchFields = ["transactionId"];
+    const modelQuery = new QueryBuilder(
+        Payment.find()
+            .populate({
+                path: "booking",
+                populate: [
+                    { path: "user", select: "name email phone picture" },
+                    { path: "tour", select: "title costFrom images location" }
+                ]
+            }),
+        query
+    );
+
+    const payments = await modelQuery
+        .search(paymentSearchFields)
+        .filter()
+        .sort()
+        .field()
+        .pagination();
+
+    const [data, meta] = await Promise.all([
+        payments.build(),
+        modelQuery.Getmeta()
+    ]);
+
+    return {
+        data,
+        meta
+    };
+};
+
+const getSinglePayment = async (id: string) => {
+    const payment = await Payment.findById(id)
+        .populate({
+            path: "booking",
+            populate: [
+                { path: "user", select: "name email phone picture address" },
+                { path: "tour", select: "title costFrom images location startDate endDate" }
+            ]
+        });
+
+    if (!payment) {
+        throw new Error("Payment record not found");
+    }
+
+    return payment;
+};
+
 export const PaymentServices = {
     successPayment,
     failedPayment,
     cancelPayment,
-    initPayment
+    initPayment,
+    getAllPayments,
+    getSinglePayment
 }

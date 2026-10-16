@@ -11,4 +11,6 @@ const stats_controller_1 = require("./stats.controller");
 const router = express_1.default.Router();
 router.get("/user", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), stats_controller_1.StatsController.getUserStats);
 router.get("/dashboard", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), stats_controller_1.StatsController.getDashboardStats);
+router.get("/monthly-analytics", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), stats_controller_1.StatsController.getMonthlyAnalytics);
+router.get("/tour-distribution", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), stats_controller_1.StatsController.getTourDistributionStats);
 exports.StatsRoutes = router;

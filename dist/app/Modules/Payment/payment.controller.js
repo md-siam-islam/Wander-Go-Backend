@@ -61,9 +61,31 @@ const cancelPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
         res.redirect(`${env_1.envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
     }
 }));
+const getAllPayments = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield payment_services_1.PaymentServices.getAllPayments(req.query);
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Payments retrieved successfully",
+        data: result.data,
+        meta: result.meta,
+    });
+}));
+const getSinglePayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const result = yield payment_services_1.PaymentServices.getSinglePayment(id);
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Payment details retrieved successfully",
+        data: result,
+    });
+}));
 exports.PaymentController = {
     successPayment,
     faildPayment,
     cancelPayment,
-    initPayment
+    initPayment,
+    getAllPayments,
+    getSinglePayment
 };

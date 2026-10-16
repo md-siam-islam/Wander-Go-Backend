@@ -109,7 +109,116 @@ const getAdminDashboardStats = async () => {
     };
 };
 
+const getMonthlyAnalytics = async () => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 11);
+    twelveMonthsAgo.setDate(1);
+    twelveMonthsAgo.setHours(0, 0, 0, 0);
+
+    const monthlyRevenue = await Payment.aggregate([
+        {
+            $match: {
+                status: PAYMENT_STATUS.PAID,
+                createdAt: { $gte: twelveMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" }
+                },
+                revenue: { $sum: "$amount" },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const monthlyBookings = await Booking.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: twelveMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" }
+                },
+                totalBookings: { $sum: 1 }
+            }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    return {
+        monthlyRevenue,
+        monthlyBookings
+    };
+};
+
+const getTourDistributionStats = async () => {
+    const toursByDivision = await Tour.aggregate([
+        {
+            $group: {
+                _id: "$division",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "divisions",
+                localField: "_id",
+                foreignField: "_id",
+                as: "divisionDetails"
+            }
+        },
+        { $unwind: { path: "$divisionDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 1,
+                name: { $ifNull: ["$divisionDetails.name", "Unknown"] },
+                count: 1
+            }
+        }
+    ]);
+
+    const toursByType = await Tour.aggregate([
+        {
+            $group: {
+                _id: "$tourType",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "tourtypes",
+                localField: "_id",
+                foreignField: "_id",
+                as: "tourTypeDetails"
+            }
+        },
+        { $unwind: { path: "$tourTypeDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 1,
+                name: { $ifNull: ["$tourTypeDetails.name", "Unknown"] },
+                count: 1
+            }
+        }
+    ]);
+
+    return {
+        toursByDivision,
+        toursByType
+    };
+};
+
 export const StatsService = {
     getUserStats,
-    getAdminDashboardStats
+    getAdminDashboardStats,
+    getMonthlyAnalytics,
+    getTourDistributionStats
 };

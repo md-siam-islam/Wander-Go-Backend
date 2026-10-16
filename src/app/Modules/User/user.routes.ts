@@ -11,10 +11,12 @@ router.post('/register'
     ,validateUser(createUserZoodSchema)
     ,UserController.CreateUser)
 router.get("/all-users" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.AllUser )
+router.get("/guides", UserController.getAllGuides )
 router.get("/me" , checkAuth(...Object.values(Role)), UserController.GetMyProfile )
 router.get('/:id',checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.getSingleUser)
 
 router.patch('/:id',validateUser(updateUserZoodSchema), checkAuth(...Object.values(Role)), UserController.UpdateUser)
+router.delete('/:id', checkAuth(Role.ADMIN, Role.SUPER_ADMIN), UserController.deleteUser)
 
 export const UserRoutes = router
 

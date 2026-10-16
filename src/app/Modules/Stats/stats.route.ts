@@ -18,4 +18,16 @@ router.get(
     StatsController.getDashboardStats
 );
 
+router.get(
+    "/monthly-analytics",
+    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    StatsController.getMonthlyAnalytics
+);
+
+router.get(
+    "/tour-distribution",
+    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    StatsController.getTourDistributionStats
+);
+
 export const StatsRoutes = router;

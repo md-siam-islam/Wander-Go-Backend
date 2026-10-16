@@ -1,7 +1,7 @@
 
 import httpStatus from 'http-status-codes';
 import { Jwt, JwtPayload } from "jsonwebtoken";
-import { IAuthprovider, IUser, Role } from "./user.interface";
+import { IAuthprovider, IUser, Role, IsActive } from "./user.interface";
 import { User } from "./user.model";
 import bcryptjs from "bcryptjs";
 import { envVariables } from "../../config/env";
@@ -82,17 +82,31 @@ const UpdateUser = async(userId : string , payload : Partial<IUser> , decodedTok
 
 }
 
-const AllUser = async () => {
+import { QueryBuilder } from "../utils/QueryBulder";
 
-    const user = await User.find({}).select('-password -auth -isDeleted -createdAt -updatedAt');
-    const totalUser = await User.countDocuments() 
+const AllUser = async (query: Record<string, string>) => {
+    const userSearchFields = ["name", "email", "phone"];
+    const modelQuery = new QueryBuilder(
+        User.find({ isDeleted: false }).select('-password -auth'),
+        query
+    );
+
+    const users = await modelQuery
+        .search(userSearchFields)
+        .filter()
+        .sort()
+        .field()
+        .pagination();
+
+    const [data, meta] = await Promise.all([
+        users.build(),
+        modelQuery.Getmeta()
+    ]);
 
     return {
-        data : user,
-        meta : {
-            total : totalUser
-        }
-    }
+        data,
+        meta
+    };
 }
 const GetMyProfile = async (decodedToken: JwtPayload) => {
 
@@ -114,11 +128,43 @@ const getSingleUser = async (userId : string) => {
     return user
 }
 
+const getAllGuides = async () => {
+    const guides = await User.find({ role: Role.GUIDE, isDeleted: false })
+        .select('-password -auth -isDeleted -createdAt -updatedAt');
+    return guides;
+};
+
+const deleteUser = async (userId: string, decodedUser: JwtPayload) => {
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+        throw new Error("User not found");
+    }
+
+    if (targetUser._id.toString() === decodedUser.userId) {
+        throw new Error("You cannot delete your own account");
+    }
+
+    if (targetUser.role === Role.SUPER_ADMIN) {
+        throw new Error("Super Admin account cannot be deleted");
+    }
+
+    if (decodedUser.role === Role.ADMIN && targetUser.role === Role.ADMIN) {
+        throw new Error("Admin cannot delete another Admin");
+    }
+
+    targetUser.isDeleted = true;
+    targetUser.isActive = IsActive.INACTIVE;
+    await targetUser.save();
+
+    return targetUser;
+};
 
 export const UserServices = {
     Createuser,
     AllUser,
     UpdateUser,
     GetMyProfile,
-    getSingleUser
+    getSingleUser,
+    getAllGuides,
+    deleteUser
 }

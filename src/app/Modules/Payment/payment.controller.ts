@@ -71,9 +71,35 @@ const cancelPayment = catchAsync (async (req:Request , res:Response, next:NextFu
 
 
 
+const getAllPayments = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PaymentServices.getAllPayments(req.query as Record<string, string>);
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Payments retrieved successfully",
+        data: result.data,
+        meta: result.meta,
+    });
+});
+
+const getSinglePayment = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const result = await PaymentServices.getSinglePayment(id);
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Payment details retrieved successfully",
+        data: result,
+    });
+});
+
 export const PaymentController = {
     successPayment,
     faildPayment,
     cancelPayment,
-    initPayment
+    initPayment,
+    getAllPayments,
+    getSinglePayment
 }

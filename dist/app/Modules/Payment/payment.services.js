@@ -115,9 +115,51 @@ const cancelPayment = (query, body) => __awaiter(void 0, void 0, void 0, functio
         throw error;
     }
 });
+const QueryBulder_1 = require("../utils/QueryBulder");
+const getAllPayments = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const paymentSearchFields = ["transactionId"];
+    const modelQuery = new QueryBulder_1.QueryBuilder(payment_model_1.Payment.find()
+        .populate({
+        path: "booking",
+        populate: [
+            { path: "user", select: "name email phone picture" },
+            { path: "tour", select: "title costFrom images location" }
+        ]
+    }), query);
+    const payments = yield modelQuery
+        .search(paymentSearchFields)
+        .filter()
+        .sort()
+        .field()
+        .pagination();
+    const [data, meta] = yield Promise.all([
+        payments.build(),
+        modelQuery.Getmeta()
+    ]);
+    return {
+        data,
+        meta
+    };
+});
+const getSinglePayment = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const payment = yield payment_model_1.Payment.findById(id)
+        .populate({
+        path: "booking",
+        populate: [
+            { path: "user", select: "name email phone picture address" },
+            { path: "tour", select: "title costFrom images location startDate endDate" }
+        ]
+    });
+    if (!payment) {
+        throw new Error("Payment record not found");
+    }
+    return payment;
+});
 exports.PaymentServices = {
     successPayment,
     failedPayment,
     cancelPayment,
-    initPayment
+    initPayment,
+    getAllPayments,
+    getSinglePayment
 };

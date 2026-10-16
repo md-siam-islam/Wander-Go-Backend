@@ -35,7 +35,27 @@ const getDashboardStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awa
         data: stats
     });
 }));
+const getMonthlyAnalytics = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const stats = yield stats_servics_1.StatsService.getMonthlyAnalytics();
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Monthly analytics fetched successfully",
+        data: stats,
+    });
+}));
+const getTourDistributionStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const stats = yield stats_servics_1.StatsService.getTourDistributionStats();
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Tour distribution stats fetched successfully",
+        data: stats,
+    });
+}));
 exports.StatsController = {
     getUserStats,
-    getDashboardStats
+    getDashboardStats,
+    getMonthlyAnalytics,
+    getTourDistributionStats
 };

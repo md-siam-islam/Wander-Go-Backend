@@ -1,7 +1,11 @@
 import { Response } from "express";
 
 interface Imeta {
-    total : number
+    total?: number;
+    totalDocument?: number;
+    page?: number;
+    limit?: number;
+    totalPage?: number;
 }
 interface Tresponse<T>{
     statuscode : number;

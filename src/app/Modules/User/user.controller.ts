@@ -24,7 +24,7 @@ const CreateUser = catchAsync (async(req:Request , res:Response, next:NextFuncti
 // user get function
 const AllUser = catchAsync( async (req:Request , res:Response,next:NextFunction) => {
         
-        const result = await UserServices.AllUser()
+        const result = await UserServices.AllUser(req.query as Record<string, string>)
         
         Sendresponse(res,{
                 success : true,
@@ -73,7 +73,7 @@ const UpdateUser = catchAsync (async(req:Request , res:Response, next:NextFuncti
         const payload = req.body
         const VerifyToken = req.user
 
-  const user = UserServices.UpdateUser(UserId, payload, VerifyToken as JwtPayload)
+        const user = await UserServices.UpdateUser(UserId, payload, VerifyToken as JwtPayload)
 
         Sendresponse(res,{
             success : true,
@@ -81,10 +81,34 @@ const UpdateUser = catchAsync (async(req:Request , res:Response, next:NextFuncti
             message : "User Update Successfull",
             data : user
         })
-}
-)
+})
+
+const getAllGuides = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const guides = await UserServices.getAllGuides();
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "Guides retrieved successfully",
+        data: guides,
+    });
+});
+
+const deleteUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id;
+    const decodedUser = req.user as JwtPayload;
+
+    const result = await UserServices.deleteUser(userId, decodedUser);
+
+    Sendresponse(res, {
+        success: true,
+        statuscode: httpStatus.OK,
+        message: "User deleted successfully",
+        data: result,
+    });
+});
 
 export const  UserController = {
-        CreateUser , AllUser , UpdateUser , GetMyProfile , getSingleUser
+        CreateUser , AllUser , UpdateUser , GetMyProfile , getSingleUser, getAllGuides, deleteUser
 }
 

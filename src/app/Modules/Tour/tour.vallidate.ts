@@ -19,6 +19,7 @@ export const tourValidationSchema = z.object({
   arrivalLocation: z.string().optional(),
   division: z.string().min(1, "Division is required"),
   tourType: z.string().min(1, "TourType is required"),
+  guides: z.array(z.string()).optional(),
 });
 
 
@@ -42,5 +43,6 @@ export const updateTourValidationSchema = z.object({
     arrivalLocation: z.string().optional(),
     images: z.array(z.string()).default([]).optional(),
     deletedImages: z.array(z.string()).optional(),
-    deleteImages: z.array(z.string()).optional()
+    deleteImages: z.array(z.string()).optional(),
+    guides: z.array(z.string()).optional()
 });

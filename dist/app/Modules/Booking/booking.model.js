@@ -26,6 +26,19 @@ const bookingSchema = new mongoose_1.Schema({
         type: String,
         enum: Object.values(booking_interface_1.BOOKING_ENUM),
         default: booking_interface_1.BOOKING_ENUM.PENDING
+    },
+    couponCode: {
+        type: String,
+    },
+    discountAmount: {
+        type: Number,
+        default: 0,
+    },
+    originalAmount: {
+        type: Number,
+    },
+    totalAmount: {
+        type: Number,
     }
 }, {
     timestamps: true

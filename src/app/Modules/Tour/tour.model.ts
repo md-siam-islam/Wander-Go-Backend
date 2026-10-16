@@ -30,7 +30,10 @@ const TourSchema = new Schema<ITour>( {
     arrivalLocation: {type : String},
     division: { type: Schema.Types.ObjectId, ref: "Division", required: true },
     tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true },
-    deletedImages: { type: [String], default: [] }
+    deletedImages: { type: [String], default: [] },
+    averageRating: { type: Number, default: 0 },
+    totalRatings: { type: Number, default: 0 },
+    guides: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }]
 }, {
     timestamps: true
 })

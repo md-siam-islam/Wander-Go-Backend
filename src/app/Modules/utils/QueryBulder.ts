@@ -75,6 +75,7 @@ export class QueryBuilder<T> {
         const totalPage = Math.ceil(totalDocument / limit);
 
         return {
+            total: totalDocument,
             totalDocument,
             page,
             limit,

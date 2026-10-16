@@ -77,14 +77,23 @@ const UpdateUser = (userId, payload, decodedToken) => __awaiter(void 0, void 0, 
     const updateUser = yield user_model_1.User.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
     return updateUser;
 });
-const AllUser = () => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.User.find({}).select('-password -auth -isDeleted -createdAt -updatedAt');
-    const totalUser = yield user_model_1.User.countDocuments();
+const QueryBulder_1 = require("../utils/QueryBulder");
+const AllUser = (query) => __awaiter(void 0, void 0, void 0, function* () {
+    const userSearchFields = ["name", "email", "phone"];
+    const modelQuery = new QueryBulder_1.QueryBuilder(user_model_1.User.find({ isDeleted: false }).select('-password -auth'), query);
+    const users = yield modelQuery
+        .search(userSearchFields)
+        .filter()
+        .sort()
+        .field()
+        .pagination();
+    const [data, meta] = yield Promise.all([
+        users.build(),
+        modelQuery.Getmeta()
+    ]);
     return {
-        data: user,
-        meta: {
-            total: totalUser
-        }
+        data,
+        meta
     };
 });
 const GetMyProfile = (decodedToken) => __awaiter(void 0, void 0, void 0, function* () {
@@ -100,10 +109,36 @@ const getSingleUser = (userId) => __awaiter(void 0, void 0, void 0, function* ()
     }
     return user;
 });
+const getAllGuides = () => __awaiter(void 0, void 0, void 0, function* () {
+    const guides = yield user_model_1.User.find({ role: user_interface_1.Role.GUIDE, isDeleted: false })
+        .select('-password -auth -isDeleted -createdAt -updatedAt');
+    return guides;
+});
+const deleteUser = (userId, decodedUser) => __awaiter(void 0, void 0, void 0, function* () {
+    const targetUser = yield user_model_1.User.findById(userId);
+    if (!targetUser) {
+        throw new Error("User not found");
+    }
+    if (targetUser._id.toString() === decodedUser.userId) {
+        throw new Error("You cannot delete your own account");
+    }
+    if (targetUser.role === user_interface_1.Role.SUPER_ADMIN) {
+        throw new Error("Super Admin account cannot be deleted");
+    }
+    if (decodedUser.role === user_interface_1.Role.ADMIN && targetUser.role === user_interface_1.Role.ADMIN) {
+        throw new Error("Admin cannot delete another Admin");
+    }
+    targetUser.isDeleted = true;
+    targetUser.isActive = user_interface_1.IsActive.INACTIVE;
+    yield targetUser.save();
+    return targetUser;
+});
 exports.UserServices = {
     Createuser,
     AllUser,
     UpdateUser,
     GetMyProfile,
-    getSingleUser
+    getSingleUser,
+    getAllGuides,
+    deleteUser
 };

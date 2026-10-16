@@ -101,7 +101,109 @@ const getAdminDashboardStats = () => __awaiter(void 0, void 0, void 0, function*
         recentBookings
     };
 });
+const getMonthlyAnalytics = () => __awaiter(void 0, void 0, void 0, function* () {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 11);
+    twelveMonthsAgo.setDate(1);
+    twelveMonthsAgo.setHours(0, 0, 0, 0);
+    const monthlyRevenue = yield payment_model_1.Payment.aggregate([
+        {
+            $match: {
+                status: payment_interface_1.PAYMENT_STATUS.PAID,
+                createdAt: { $gte: twelveMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" }
+                },
+                revenue: { $sum: "$amount" },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+    const monthlyBookings = yield booking_model_1.Booking.aggregate([
+        {
+            $match: {
+                createdAt: { $gte: twelveMonthsAgo }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: "$createdAt" },
+                    month: { $month: "$createdAt" }
+                },
+                totalBookings: { $sum: 1 }
+            }
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+    return {
+        monthlyRevenue,
+        monthlyBookings
+    };
+});
+const getTourDistributionStats = () => __awaiter(void 0, void 0, void 0, function* () {
+    const toursByDivision = yield tour_model_1.Tour.aggregate([
+        {
+            $group: {
+                _id: "$division",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "divisions",
+                localField: "_id",
+                foreignField: "_id",
+                as: "divisionDetails"
+            }
+        },
+        { $unwind: { path: "$divisionDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 1,
+                name: { $ifNull: ["$divisionDetails.name", "Unknown"] },
+                count: 1
+            }
+        }
+    ]);
+    const toursByType = yield tour_model_1.Tour.aggregate([
+        {
+            $group: {
+                _id: "$tourType",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $lookup: {
+                from: "tourtypes",
+                localField: "_id",
+                foreignField: "_id",
+                as: "tourTypeDetails"
+            }
+        },
+        { $unwind: { path: "$tourTypeDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: 1,
+                name: { $ifNull: ["$tourTypeDetails.name", "Unknown"] },
+                count: 1
+            }
+        }
+    ]);
+    return {
+        toursByDivision,
+        toursByType
+    };
+});
 exports.StatsService = {
     getUserStats,
-    getAdminDashboardStats
+    getAdminDashboardStats,
+    getMonthlyAnalytics,
+    getTourDistributionStats
 };

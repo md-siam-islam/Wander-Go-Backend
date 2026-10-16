@@ -12,6 +12,7 @@ exports.createBookingZodSchema = zod_1.z.object({
         .int({ message: "Guest count must be an integer" })
         .min(1, { message: "Guest count must be at least 1" })
         .max(50, { message: "Guest count cannot exceed 50 per booking" }),
+    couponCode: zod_1.z.string().optional(),
 });
 exports.updateBookingStatusZodSchema = zod_1.z.object({
     status: zod_1.z.enum([booking_interface_1.BOOKING_ENUM.PENDING, booking_interface_1.BOOKING_ENUM.COMPLETE, booking_interface_1.BOOKING_ENUM.CANCEL, booking_interface_1.BOOKING_ENUM.FAILED], {
