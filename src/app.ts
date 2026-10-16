@@ -8,10 +8,22 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import expressSession from "express-session";
 import "./app/config/passport"; // Ensure passport configuration is loaded
+import mongoose from "mongoose";
 import { envVariables } from "./app/config/env";
 
-
 const app = express();
+
+// Ensure database connection in serverless environments (e.g. Vercel cold starts)
+app.use(async (_req: Request, _res: Response, next) => {
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            await mongoose.connect(envVariables.DB_URL);
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 app.use(expressSession({
     secret: envVariables.EXPRESS_SESSION_SECRET || "wandergo_session_secret",

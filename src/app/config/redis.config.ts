@@ -6,21 +6,34 @@ export const redisClient = createClient({
     password: envVariables.REDIS.REDIS_PASSWORD,
     socket: {
         host: envVariables.REDIS.REDIS_HOST,
-        port: Number(envVariables.REDIS.REDIS_PORT)
+        port: Number(envVariables.REDIS.REDIS_PORT),
+        connectTimeout: 3000,
+        reconnectStrategy: (retries) => {
+            if (retries > 2) {
+                return false; // Stop retrying after 2 attempts
+            }
+            return 1000;
+        }
     }
 });
 
-redisClient.on('error', err => console.log('Redis Client Error', err));
-
-// await redisClient.connect();
-// await redisClient.set('foo', 'bar');
-// const result = await redisClient.get('foo');
-// console.log(result)  // >>> bar
+redisClient.on('error', (err: any) => {
+    console.warn('⚠️ Redis Client Warning:', err?.message || err);
+});
 
 export const connectRedis = async () => {
-    if(!redisClient.isOpen){
-        await redisClient.connect();
-        console.log('Redis connected successfully');
+    try {
+        if (!redisClient.isOpen) {
+            await Promise.race([
+                redisClient.connect(),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Redis connection timed out after 3s')), 3000)
+                )
+            ]);
+            console.log('✅ Redis connected successfully');
+        }
+    } catch (error: any) {
+        console.warn('⚠️ Could not connect to Redis:', error?.message || error);
     }
-}
+};
 
