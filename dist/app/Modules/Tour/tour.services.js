@@ -17,10 +17,10 @@ const cloudinary_config_1 = require("../../config/cloudinary.config");
 //----- Tour Type Services starts -----//
 const CreateTourtype = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     // Implementation for creating a tour
-    // const Existour = await TourType.findOne({name: payload.name}) 
-    // if(Existour){
-    //     throw new Error("Tour Type already exists")
-    // }
+    const Existour = yield tour_model_1.TourType.findOne({ name: payload.name });
+    if (Existour) {
+        throw new Error("Tour Type already exists");
+    }
     const tourtype = yield tour_model_1.TourType.create(payload);
     return tourtype;
 });

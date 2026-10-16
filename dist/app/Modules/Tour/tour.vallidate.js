@@ -33,10 +33,12 @@ exports.updateTourValidationSchema = zod_1.z.object({
     excluded: zod_1.z.array(zod_1.z.string()).optional(),
     amenities: zod_1.z.array(zod_1.z.string()).optional(),
     tourPlan: zod_1.z.array(zod_1.z.string()).optional(),
+    maxGuests: zod_1.z.number().optional(),
     maxGuest: zod_1.z.number().optional(),
     minAge: zod_1.z.number().optional(),
     departureLocation: zod_1.z.string().optional(),
     arrivalLocation: zod_1.z.string().optional(),
     images: zod_1.z.array(zod_1.z.string()).default([]).optional(),
+    deletedImages: zod_1.z.array(zod_1.z.string()).optional(),
     deleteImages: zod_1.z.array(zod_1.z.string()).optional()
 });

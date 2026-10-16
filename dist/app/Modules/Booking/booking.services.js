@@ -21,30 +21,63 @@ const getTransactionId = () => {
     return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 };
 const createBooking = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const transactionId = getTransactionId();
     const session = yield booking_model_1.Booking.startSession();
     session.startTransaction();
     try {
         const user = yield user_model_1.User.findById(userId);
         if (!user) {
-            throw new Error("user not Found . Error BY Booking Servces");
+            throw new Error("User not found");
         }
-        const tour = yield tour_model_1.Tour.findById(payload.tour).select("costFrom");
+        if (!user.phone || !user.address) {
+            throw new Error("Please update your profile to provide your phone number and address before booking");
+        }
+        const tour = yield tour_model_1.Tour.findById(payload.tour).select("title costFrom maxGests maxGuests");
         if (!tour) {
             throw new Error("Tour not found");
         }
         if (!tour.costFrom) {
-            throw new Error("costFrom Not found Place costFrom provide Koren");
+            throw new Error("Tour cost is not available");
         }
-        const TotalAmount = Number(tour.costFrom) * Number(payload.guestCount);
-        const booking = yield booking_model_1.Booking.create([Object.assign({ user: userId, BookingStatus: booking_interface_1.BOOKING_ENUM.PENDING }, payload)], { session });
+        const guestCount = Number(payload.guestCount) || 1;
+        const maxCapacity = tour.maxGuests || tour.maxGests || 0;
+        // Check seat availability
+        if (maxCapacity > 0) {
+            const existingBookings = yield booking_model_1.Booking.aggregate([
+                {
+                    $match: {
+                        tour: tour._id,
+                        status: { $in: [booking_interface_1.BOOKING_ENUM.PENDING, booking_interface_1.BOOKING_ENUM.COMPLETE] }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalBooked: { $sum: "$guestCount" }
+                    }
+                }
+            ]);
+            const alreadyBooked = ((_a = existingBookings[0]) === null || _a === void 0 ? void 0 : _a.totalBooked) || 0;
+            if (alreadyBooked + guestCount > maxCapacity) {
+                const availableSeats = Math.max(0, maxCapacity - alreadyBooked);
+                throw new Error(`Only ${availableSeats} seat(s) available for this tour. You requested ${guestCount}.`);
+            }
+        }
+        const TotalAmount = Number(tour.costFrom) * guestCount;
+        const booking = yield booking_model_1.Booking.create([{
+                user: userId,
+                tour: payload.tour,
+                guestCount: guestCount,
+                status: booking_interface_1.BOOKING_ENUM.PENDING
+            }], { session });
         const payment = yield payment_model_1.Payment.create([{
                 booking: booking[0]._id,
                 status: payment_interface_1.PAYMENT_STATUS.UNPAID,
                 transactionId: transactionId,
                 amount: TotalAmount
             }], { session });
-        const UpdatedBooking = yield booking_model_1.Booking.findByIdAndUpdate(booking[0]._id, { payment: payment[0]._id }, { new: true, runValidators: true, session }).populate("user", "name email phone address").populate("tour", "title costFrom").populate("payment");
+        const UpdatedBooking = yield booking_model_1.Booking.findByIdAndUpdate(booking[0]._id, { payment: payment[0]._id }, { new: true, runValidators: true, session }).populate("user", "name email phone address").populate("tour", "title costFrom images location").populate("payment");
         const Name = (UpdatedBooking === null || UpdatedBooking === void 0 ? void 0 : UpdatedBooking.user).name;
         const Email = (UpdatedBooking === null || UpdatedBooking === void 0 ? void 0 : UpdatedBooking.user).email;
         const Phone = (UpdatedBooking === null || UpdatedBooking === void 0 ? void 0 : UpdatedBooking.user).phone;
@@ -72,15 +105,15 @@ const createBooking = (payload, userId) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 const getAllbooking = () => __awaiter(void 0, void 0, void 0, function* () {
-    const allBooking = yield booking_model_1.Booking.find().populate("user", "name email phone address").populate("tour", "title costFrom").populate("payment");
+    const allBooking = yield booking_model_1.Booking.find().populate("user", "name email phone address").populate("tour", "title costFrom images location").populate("payment");
     return allBooking;
 });
 const getsinglebooking = (bookingId) => __awaiter(void 0, void 0, void 0, function* () {
-    const singleBooking = yield booking_model_1.Booking.findById(bookingId).populate("user", "name email phone address").populate("tour", "title costFrom").populate("payment");
+    const singleBooking = yield booking_model_1.Booking.findById(bookingId).populate("user", "name email phone address").populate("tour", "title costFrom images location").populate("payment");
     return singleBooking;
 });
 const getMybooking = (decodedUser) => __awaiter(void 0, void 0, void 0, function* () {
-    const Mybooking = yield booking_model_1.Booking.find({ user: decodedUser.userId });
+    const Mybooking = yield booking_model_1.Booking.find({ user: decodedUser.userId }).populate("tour", "title costFrom images location startDate endDate").populate("payment");
     return Mybooking;
 });
 exports.BookingServices = {

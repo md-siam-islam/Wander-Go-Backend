@@ -16,6 +16,7 @@ included?: string[];
 excluded?: string[];
 amenities?: string[];
 tourPlan?: string[];
+maxGuests?: number;
 maxGests?: number;
 minAge?: number;
 departureLocation ?: string;

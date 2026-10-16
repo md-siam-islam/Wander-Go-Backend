@@ -38,25 +38,42 @@ const initPayment = async (bookingId : string) => {
         }
 
 }
-const successPayment = async (query : Record<string, string>) => {
+const successPayment = async (query : Record<string, string>, body?: any) => {
 
     const session = await Booking.startSession()
     session.startTransaction()
 
     try {
+        const transactionId = query.transactionId || body?.tran_id;
+        if (!transactionId) {
+            throw new Error("Transaction ID is missing");
+        }
         
-        const Updatedpayment = await Payment.findOneAndUpdate({transactionId: query.transactionId },
-            { status : PAYMENT_STATUS.PAID} ,{session})
+        const Updatedpayment = await Payment.findOneAndUpdate(
+            { transactionId },
+            { 
+                status : PAYMENT_STATUS.PAID,
+                paymentGatewayData: body || query
+            },
+            { session, new: true }
+        )
 
-            await Booking.findByIdAndUpdate(Updatedpayment?.booking,{status: BOOKING_ENUM.CPMPLATE},
-            {new : true , runValidators : true, session}).populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+        if (!Updatedpayment) {
+            throw new Error("Payment record not found for transaction: " + transactionId);
+        }
+
+        await Booking.findByIdAndUpdate(
+            Updatedpayment.booking,
+            { status: BOOKING_ENUM.COMPLETE },
+            { new : true , runValidators : true, session }
+        ).populate("user" , "name email phone address").populate("tour" , "title costFrom").populate("payment")
             
-            await session.commitTransaction()
-            session.endSession()
+        await session.commitTransaction()
+        session.endSession()
 
-            return {
-                success : true , message : "payment Successfull"
-            }
+        return {
+            success : true , message : "Payment successful"
+        }
 
     } catch (error) {
         await session.abortTransaction()
@@ -66,25 +83,37 @@ const successPayment = async (query : Record<string, string>) => {
 
 }
 
-const failedPayment = async (query : Record<string, string>) =>{
+const failedPayment = async (query : Record<string, string>, body?: any) =>{
 
     const session = await Booking.startSession()
     session.startTransaction()
 
     try {
+        const transactionId = query.transactionId || body?.tran_id;
         
-        const Updatedpayment = await Payment.findOneAndUpdate({transactionId: query.transactionId },
-            { status : PAYMENT_STATUS.FAILED} ,{session})
+        const Updatedpayment = await Payment.findOneAndUpdate(
+            { transactionId },
+            { 
+                status : PAYMENT_STATUS.FAILED,
+                paymentGatewayData: body || query
+            },
+            { session, new: true }
+        )
 
-            await Booking.findByIdAndUpdate(Updatedpayment?.booking,{status: BOOKING_ENUM.FAILED},
-            {runValidators : true, session})
+        if (Updatedpayment) {
+            await Booking.findByIdAndUpdate(
+                Updatedpayment.booking,
+                { status: BOOKING_ENUM.FAILED },
+                { runValidators : true, session }
+            )
+        }
             
-            await session.commitTransaction()
-            session.endSession()
+        await session.commitTransaction()
+        session.endSession()
 
-            return {
-                success : false , message : "payment field"
-            }
+        return {
+            success : false , message : "Payment failed"
+        }
 
     } catch (error) {
         await session.abortTransaction()
@@ -92,25 +121,37 @@ const failedPayment = async (query : Record<string, string>) =>{
         throw error
     }
 }
-const cancelPayment = async (query : Record<string, string>) =>{
+const cancelPayment = async (query : Record<string, string>, body?: any) =>{
 
     const session = await Booking.startSession()
     session.startTransaction()
 
     try {
+        const transactionId = query.transactionId || body?.tran_id;
         
-        const Updatedpayment = await Payment.findOneAndUpdate({transactionId: query.transactionId },
-            { status : PAYMENT_STATUS.CANCLE} ,{session})
+        const Updatedpayment = await Payment.findOneAndUpdate(
+            { transactionId },
+            { 
+                status : PAYMENT_STATUS.CANCEL,
+                paymentGatewayData: body || query
+            },
+            { session, new: true }
+        )
 
-            await Booking.findByIdAndUpdate(Updatedpayment?.booking,{status: BOOKING_ENUM.CANCLE},
-            {runValidators : true, session})
+        if (Updatedpayment) {
+            await Booking.findByIdAndUpdate(
+                Updatedpayment.booking,
+                { status: BOOKING_ENUM.CANCEL },
+                { runValidators : true, session }
+            )
+        }
             
-            await session.commitTransaction()
-            session.endSession()
+        await session.commitTransaction()
+        session.endSession()
 
-            return {
-                success : false , message : "payment canclled"
-            }
+        return {
+            success : false , message : "Payment cancelled"
+        }
 
     } catch (error) {
         await session.abortTransaction()

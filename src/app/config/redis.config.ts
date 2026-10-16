@@ -24,24 +24,3 @@ export const connectRedis = async () => {
     }
 }
 
-
-
-// import { createClient } from 'redis';
-
-// const client = createClient({
-//     username: 'default',
-//     password: '3MjNreDmP5AE4iuzPT2MRwuvmwGTVDzH',
-//     socket: {
-//         host: 'redis-11808.c91.us-east-1-3.ec2.cloud.redislabs.com',
-//         port: 11808
-//     }
-// });
-
-// client.on('error', err => console.log('Redis Client Error', err));
-
-// await client.connect();
-
-// await client.set('foo', 'bar');
-// const result = await client.get('foo');
-// console.log(result)  // >>> bar
-

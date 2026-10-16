@@ -21,6 +21,7 @@ const TourSchema = new mongoose_1.Schema({
     excluded: { type: [String], default: [] },
     amenities: { type: [String], default: [] },
     tourPlan: { type: [String], default: [] },
+    maxGuests: { type: Number },
     maxGests: { type: Number },
     minAge: { type: Number },
     departureLocation: { type: String },

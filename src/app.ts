@@ -14,7 +14,7 @@ import { envVariables } from "./app/config/env";
 const app = express();
 
 app.use(expressSession({
-    secret: "your_secret_key",
+    secret: envVariables.EXPRESS_SESSION_SECRET || "wandergo_session_secret",
     resave: false,
     saveUninitialized: false
 }))

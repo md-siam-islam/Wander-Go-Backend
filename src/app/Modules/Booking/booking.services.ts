@@ -24,29 +24,56 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
     const user = await User.findById(userId)
 
     if(!user){
-        throw new Error("user not Found . Error BY Booking Servces")
+        throw new Error("User not found")
     }
 
-    if(!user.phone && !user.address){
-        throw new Error("Please Update Your Profile Provide phone and address")
+    if(!user.phone || !user.address){
+        throw new Error("Please update your profile to provide your phone number and address before booking")
     }
 
-    const tour =  await Tour.findById(payload.tour).select("costFrom")
+    const tour = await Tour.findById(payload.tour).select("title costFrom maxGests maxGuests")
     
     if (!tour) {
         throw new Error("Tour not found");
     }
 
     if(!tour.costFrom){
-        throw new Error("costFrom Not found Place costFrom provide Koren")
+        throw new Error("Tour cost is not available");
     }
 
-    const TotalAmount = Number(tour.costFrom) * Number(payload.guestCount)
+    const guestCount = Number(payload.guestCount) || 1;
+    const maxCapacity = (tour as any).maxGuests || (tour as any).maxGests || 0;
 
-    const booking =await Booking.create([{
+    // Check seat availability
+    if (maxCapacity > 0) {
+        const existingBookings = await Booking.aggregate([
+            {
+                $match: {
+                    tour: tour._id,
+                    status: { $in: [BOOKING_ENUM.PENDING, BOOKING_ENUM.COMPLETE] }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalBooked: { $sum: "$guestCount" }
+                }
+            }
+        ]);
+        const alreadyBooked = existingBookings[0]?.totalBooked || 0;
+        if (alreadyBooked + guestCount > maxCapacity) {
+            const availableSeats = Math.max(0, maxCapacity - alreadyBooked);
+            throw new Error(`Only ${availableSeats} seat(s) available for this tour. You requested ${guestCount}.`);
+        }
+    }
+
+    const TotalAmount = Number(tour.costFrom) * guestCount
+
+    const booking = await Booking.create([{
         user : userId,
-        BookingStatus : BOOKING_ENUM.PENDING,
-        ...payload
+        tour : payload.tour,
+        guestCount : guestCount,
+        status : BOOKING_ENUM.PENDING
     }],{session})
 
     const payment = await Payment.create([{
@@ -56,7 +83,7 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
         amount : TotalAmount
     }] ,{session})
 
-    const UpdatedBooking = await Booking.findByIdAndUpdate(booking[0]._id , {payment :  payment[0]._id} , {new : true , runValidators : true, session}).populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+    const UpdatedBooking = await Booking.findByIdAndUpdate(booking[0]._id , {payment : payment[0]._id} , {new : true , runValidators : true, session}).populate("user" , "name email phone address").populate("tour" , "title costFrom images location").populate("payment")
     
     const Name = (UpdatedBooking?.user as any).name
     const Email = (UpdatedBooking?.user as any).email
@@ -74,8 +101,6 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
 
     const sslPaymentGetway = await SSLservices.sslPayment(sslArgument)
     
-    console.log("SSL RESPONSE =", sslPaymentGetway)
-
     await session.commitTransaction()
     session.endSession()
 
@@ -96,20 +121,19 @@ const createBooking = async (payload:Partial<IBooking> , userId : string) => {
 
 const getAllbooking = async () => {
 
-    const allBooking = await Booking.find().populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+    const allBooking = await Booking.find().populate("user" , "name email phone address").populate("tour" , "title costFrom images location").populate("payment")
     return allBooking
 }
 const getsinglebooking = async (bookingId : string) => {
 
-    const singleBooking = await Booking.findById(bookingId).populate("user" , "name email phone address",).populate("tour" , "title costFrom").populate("payment")
+    const singleBooking = await Booking.findById(bookingId).populate("user" , "name email phone address").populate("tour" , "title costFrom images location").populate("payment")
 
     return singleBooking
 }
 
 const getMybooking = async (decodedUser : JwtPayload) => {
 
-
-    const Mybooking = await Booking.find({user : decodedUser.userId})
+    const Mybooking = await Booking.find({user : decodedUser.userId}).populate("tour" , "title costFrom images location startDate endDate").populate("payment")
 
     return Mybooking
 }

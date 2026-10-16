@@ -24,7 +24,10 @@ const CreateBooking = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
         success: true,
         statuscode: http_status_codes_1.default.OK,
         message: "Booking Created Successfully",
-        data: Booking
+        data: {
+            bookingDetails: Booking.BookingDetails,
+            paymentUrl: Booking.paymentUrl || "Payment URL not found"
+        }
     });
 }));
 const getAllbooking = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

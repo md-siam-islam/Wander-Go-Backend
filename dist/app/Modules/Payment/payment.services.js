@@ -20,7 +20,8 @@ const initPayment = (bookingId) => __awaiter(void 0, void 0, void 0, function* (
     if (!payment) {
         throw new Error("Booking not found , place again make booking for tour");
     }
-    const booking = yield booking_model_1.Booking.findById(payment.booking);
+    const booking = yield booking_model_1.Booking.findById(payment.booking)
+        .populate("user");
     const Name = (booking === null || booking === void 0 ? void 0 : booking.user).name;
     const Email = (booking === null || booking === void 0 ? void 0 : booking.user).email;
     const Phone = (booking === null || booking === void 0 ? void 0 : booking.user).phone;
@@ -38,16 +39,26 @@ const initPayment = (bookingId) => __awaiter(void 0, void 0, void 0, function* (
         paymentUrl: sslPaymentGetway.GatewayPageURL
     };
 });
-const successPayment = (query) => __awaiter(void 0, void 0, void 0, function* () {
+const successPayment = (query, body) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield booking_model_1.Booking.startSession();
     session.startTransaction();
     try {
-        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId: query.transactionId }, { status: payment_interface_1.PAYMENT_STATUS.PAID }, { session });
-        yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment === null || Updatedpayment === void 0 ? void 0 : Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.CPMPLATE }, { new: true, runValidators: true, session }).populate("user", "name email phone address").populate("tour", "title costFrom").populate("payment");
+        const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id);
+        if (!transactionId) {
+            throw new Error("Transaction ID is missing");
+        }
+        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId }, {
+            status: payment_interface_1.PAYMENT_STATUS.PAID,
+            paymentGatewayData: body || query
+        }, { session, new: true });
+        if (!Updatedpayment) {
+            throw new Error("Payment record not found for transaction: " + transactionId);
+        }
+        yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.COMPLETE }, { new: true, runValidators: true, session }).populate("user", "name email phone address").populate("tour", "title costFrom").populate("payment");
         yield session.commitTransaction();
         session.endSession();
         return {
-            success: true, message: "payment Successfull"
+            success: true, message: "Payment successful"
         };
     }
     catch (error) {
@@ -56,16 +67,22 @@ const successPayment = (query) => __awaiter(void 0, void 0, void 0, function* ()
         throw error;
     }
 });
-const failedPayment = (query) => __awaiter(void 0, void 0, void 0, function* () {
+const failedPayment = (query, body) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield booking_model_1.Booking.startSession();
     session.startTransaction();
     try {
-        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId: query.transactionId }, { status: payment_interface_1.PAYMENT_STATUS.FAILED }, { session });
-        yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment === null || Updatedpayment === void 0 ? void 0 : Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.FAILED }, { runValidators: true, session });
+        const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id);
+        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId }, {
+            status: payment_interface_1.PAYMENT_STATUS.FAILED,
+            paymentGatewayData: body || query
+        }, { session, new: true });
+        if (Updatedpayment) {
+            yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.FAILED }, { runValidators: true, session });
+        }
         yield session.commitTransaction();
         session.endSession();
         return {
-            success: false, message: "payment field"
+            success: false, message: "Payment failed"
         };
     }
     catch (error) {
@@ -74,16 +91,22 @@ const failedPayment = (query) => __awaiter(void 0, void 0, void 0, function* () 
         throw error;
     }
 });
-const cancelPayment = (query) => __awaiter(void 0, void 0, void 0, function* () {
+const cancelPayment = (query, body) => __awaiter(void 0, void 0, void 0, function* () {
     const session = yield booking_model_1.Booking.startSession();
     session.startTransaction();
     try {
-        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId: query.transactionId }, { status: payment_interface_1.PAYMENT_STATUS.CANCLE }, { session });
-        yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment === null || Updatedpayment === void 0 ? void 0 : Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.CANCLE }, { runValidators: true, session });
+        const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id);
+        const Updatedpayment = yield payment_model_1.Payment.findOneAndUpdate({ transactionId }, {
+            status: payment_interface_1.PAYMENT_STATUS.CANCEL,
+            paymentGatewayData: body || query
+        }, { session, new: true });
+        if (Updatedpayment) {
+            yield booking_model_1.Booking.findByIdAndUpdate(Updatedpayment.booking, { status: booking_interface_1.BOOKING_ENUM.CANCEL }, { runValidators: true, session });
+        }
         yield session.commitTransaction();
         session.endSession();
         return {
-            success: false, message: "payment canclled"
+            success: false, message: "Payment cancelled"
         };
     }
     catch (error) {

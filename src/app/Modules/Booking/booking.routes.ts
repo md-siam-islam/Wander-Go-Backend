@@ -3,10 +3,13 @@ import { BookingController } from './booking.controller';
 import { checkAuth } from '../../../MIddleware/checkAuth';
 import { Role } from '../User/user.interface';
 
+import { createBookingZodSchema } from './booking.validation';
+import { validateRequest } from '../../../MIddleware/validate.user';
+
 const router = express.Router()
 
 // create booking
-router.post("/", checkAuth(...Object.values(Role)), BookingController.CreateBooking)
+router.post("/", checkAuth(...Object.values(Role)), validateRequest(createBookingZodSchema), BookingController.CreateBooking)
 
 // get all booking 
 router.get("/",checkAuth(Role.ADMIN , Role.SUPER_ADMIN), BookingController.getAllbooking)

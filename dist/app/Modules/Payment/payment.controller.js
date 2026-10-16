@@ -30,23 +30,35 @@ const initPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
 }));
 const successPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const result = yield payment_services_1.PaymentServices.successPayment(query);
+    const body = req.body;
+    const result = yield payment_services_1.PaymentServices.successPayment(query, body);
+    const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
+    const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
+    const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "success";
     if (result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`);
+        res.redirect(`${env_1.envVariables.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
     }
 }));
 const faildPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const result = yield payment_services_1.PaymentServices.failedPayment(query);
+    const body = req.body;
+    const result = yield payment_services_1.PaymentServices.failedPayment(query, body);
+    const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
+    const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
+    const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "fail";
     if (!result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`);
+        res.redirect(`${env_1.envVariables.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
     }
 }));
 const cancelPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const result = yield payment_services_1.PaymentServices.cancelPayment(query);
+    const body = req.body;
+    const result = yield payment_services_1.PaymentServices.cancelPayment(query, body);
+    const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
+    const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
+    const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "cancel";
     if (!result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`);
+        res.redirect(`${env_1.envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
     }
 }));
 exports.PaymentController = {

@@ -23,16 +23,12 @@ function StartServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(env_1.envVariables.DB_URL);
-            // await mongoose.connect("mongodb+srv://wandergo:pBf1Mto6IvEySCwN@cluster0.5b559.mongodb.net/WanderGo?retryWrites=true&w=majority&appName=Cluster0")
             server = app_1.default.listen(PORT, () => {
-                console.log(`server start on port ${PORT}`);
+                console.log(`🚀 Server running on port ${PORT}`);
             });
-            // server = app.listen(PORT , () => {
-            //     console.log(`server start on port ${PORT}`);
-            // })
         }
         catch (error) {
-            console.log(error);
+            console.error("❌ Failed to connect to database:", error);
         }
     });
 }
@@ -42,7 +38,7 @@ function StartServer() {
     yield (0, seedSuperAdmin_1.seedSuperAdmin)();
 }))();
 process.on("SIGTERM", () => {
-    console.log("Server shout down");
+    console.log("Server shut down");
     if (server) {
         server.close(() => {
             process.exit(1);
@@ -51,7 +47,7 @@ process.on("SIGTERM", () => {
     process.exit(1);
 });
 process.on("unhandledRejection", (error) => {
-    console.log("unHandle Rejection error", error);
+    console.log("Unhandled Rejection error", error);
     if (server) {
         server.close(() => {
             process.exit(1);
@@ -60,7 +56,7 @@ process.on("unhandledRejection", (error) => {
     process.exit(1);
 });
 process.on("uncaughtException", (error) => {
-    console.log("uncaughtException Rejection error", error);
+    console.log("Uncaught Exception error", error);
     if (server) {
         server.close(() => {
             process.exit(1);
@@ -68,5 +64,3 @@ process.on("uncaughtException", (error) => {
     }
     process.exit(1);
 });
-// pBf1Mto6IvEySCwN
-// wandergo

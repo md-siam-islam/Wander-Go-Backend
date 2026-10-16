@@ -89,4 +89,6 @@ exports.updateUserZoodSchema = zod_1.default.object({
         message: "Phone number must be a valid Bangladeshi number",
     })
         .optional(),
+    address: zod_1.default.string().optional(),
+    picture: zod_1.default.string().optional(),
 });

@@ -17,6 +17,7 @@ const crypto_1 = __importDefault(require("crypto"));
 const redis_config_1 = require("../../config/redis.config");
 const emailSener_1 = require("../utils/emailSener");
 const user_model_1 = require("../User/user.model");
+const userAccessToken_1 = require("../utils/userAccessToken");
 const OTP_EXPIRY_TIME = 2 * 60; // 2 minutes in seconds
 const generateOTP = (length = 6) => {
     const otp = crypto_1.default.randomInt(10 ** (length - 1), 10 ** length).toString();
@@ -66,6 +67,8 @@ const verifyOTP = (email, otp) => __awaiter(void 0, void 0, void 0, function* ()
         user_model_1.User.updateOne({ email }, { isVerified: true }, { runValidators: true }),
         redis_config_1.redisClient.del([radisKey])
     ]);
+    const tokenInfo = (0, userAccessToken_1.JwtAccessToken)(user);
+    return tokenInfo;
 });
 exports.OtpService = {
     sendOTP,

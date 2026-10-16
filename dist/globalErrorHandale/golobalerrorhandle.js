@@ -33,6 +33,15 @@ const globalErrorHandle = (error, req, res, next) => __awaiter(void 0, void 0, v
             errorType: "CastError",
         });
     }
+    if (error.code === 11000) {
+        const field = Object.keys(error.keyValue || {})[0] || "field";
+        const value = error.keyValue ? error.keyValue[field] : "";
+        return res.status(400).json({
+            success: false,
+            message: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" already exists`,
+            errorType: "DuplicateKeyError",
+        });
+    }
     if (error.name === "ValidationError") {
         const errors = Object.values(error.errors).map((val) => ({
             field: val.path,

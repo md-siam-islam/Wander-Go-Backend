@@ -3,9 +3,12 @@ import { Types } from "mongoose";
 
 export enum BOOKING_ENUM {
     PENDING = "PENDING",
-    CANCLE = "CANCLE",
-    CPMPLATE = "COMPLATE",
-    FAILED = "FAILED"
+    CANCEL = "CANCEL",
+    COMPLETE = "COMPLETE",
+    FAILED = "FAILED",
+    // Backward compatibility aliases
+    CANCLE = "CANCEL",
+    CPMPLATE = "COMPLETE"
 }
 
 export interface IBooking {

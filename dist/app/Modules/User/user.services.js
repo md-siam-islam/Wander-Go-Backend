@@ -29,14 +29,11 @@ const user_model_1 = require("./user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const env_1 = require("../../config/env");
 const Createuser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = payload, rest = __rest(payload
-    // const emailExists = await User.findOne({ email });
-    //    if (emailExists) {
-    //         const error: any = new Error("User already exists");
-    //         error.statusCode = 409; 
-    //         throw error;
-    //     }
-    , ["email", "password"]);
+    const { email, password } = payload, rest = __rest(payload, ["email", "password"]);
+    const isUserExist = yield user_model_1.User.findOne({ email });
+    if (isUserExist) {
+        throw new Error(" This Email User already exists");
+    }
     // const emailExists = await User.findOne({ email });
     //    if (emailExists) {
     //         const error: any = new Error("User already exists");

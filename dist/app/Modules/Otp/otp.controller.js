@@ -17,6 +17,7 @@ const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const catchAsync_1 = require("../utils/catchAsync");
 const otp_services_1 = require("./otp.services");
 const sendResponse_1 = require("../utils/sendResponse");
+const setCookies_1 = require("../utils/setCookies");
 const sendOtp = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     yield otp_services_1.OtpService.sendOTP(email);
@@ -29,12 +30,14 @@ const sendOtp = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 
 }));
 const verifyOTP = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, otp } = req.body;
-    yield otp_services_1.OtpService.verifyOTP(email, otp);
+    // await OtpService.verifyOTP(email , otp);
+    const tokenInfo = yield otp_services_1.OtpService.verifyOTP(email, otp);
+    (0, setCookies_1.setCookiesAccessTokenwithRefreshToken)(res, tokenInfo);
     (0, sendResponse_1.Sendresponse)(res, {
         success: true,
         statuscode: http_status_codes_1.default.OK,
         message: "OTP verified successfully",
-        data: null
+        data: tokenInfo
     });
 }));
 exports.OtpController = {

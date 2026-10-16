@@ -55,28 +55,39 @@ passport.use(
     }, 
     async (accessToken: string , refreshToken : string , profile : Profile , Done: VerifyCallback) => {
             try {
-                const email = profile.emails?.[0].value;
+                const email = profile.emails?.[0]?.value;
                 if(!email){
                     return Done(null , false, {message : "Email not found in Google profile"});
                 }
 
-                const user = await User.findOne({email})
+                let user = await User.findOne({email})
 
                 if(!user){
-                    const user = await User.create({
+                    user = await User.create({
                         email,
-                        name: profile.displayName,
-                        photo : profile.photos?.[0].value,
+                        name: profile.displayName || "Google User",
+                        picture : profile.photos?.[0]?.value,
                         role: Role.USER,
                         auth: [{
-                            Provider: "google",
+                            Provider: "Google",
                             ProviderId: profile.id
                         }],
                         isVerified: true,
-
                     });
                     return Done(null, user);
                 }
+
+                // If user exists, link Google provider if not already linked
+                const hasGoogleAuth = user.auth.some(p => p.Provider?.toLowerCase() === "google");
+                if (!hasGoogleAuth) {
+                    user.auth.push({
+                        Provider: "Google",
+                        ProviderId: profile.id
+                    });
+                    await user.save();
+                }
+
+                return Done(null, user);
 
             } catch (error) {
                 console.error("Error during Google OAuth:", error);

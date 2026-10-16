@@ -4,8 +4,10 @@ export enum PAYMENT_STATUS {
     PAID = "PAID",
     UNPAID = "UNPAID",
     FAILED = "FAILED",
-    CANCLE = "CANCLE",
-    REFUNDED = "REFUNDED"
+    CANCEL = "CANCEL",
+    REFUNDED = "REFUNDED",
+    // Backward compatibility alias
+    CANCLE = "CANCEL"
 }
 export interface IPayment {
     booking : Types.ObjectId,

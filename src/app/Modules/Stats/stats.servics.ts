@@ -1,32 +1,34 @@
 import { IsActive } from "../User/user.interface";
 import { User } from "../User/user.model";
-
-const now = new Date();
-const lastSevenDays = new Date(now).setDate(now.getDate() - 7);
-const lastThirtyDays = new Date(now).setDate(now.getDate() - 30);
+import { Booking } from "../Booking/booking.model";
+import { Payment } from "../Payment/payment.model";
+import { PAYMENT_STATUS } from "../Payment/payment.interface";
+import { Tour } from "../Tour/tour.model";
+import { BOOKING_ENUM } from "../Booking/booking.interface";
 
 const getUserStats = async () => {
+    const now = new Date();
+    const lastSevenDays = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const lastThirtyDays = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const totalUsersPromise = User.countDocuments()
+    const totalUsersPromise = User.countDocuments();
     const totalActiveUser = User.countDocuments({ isActive: IsActive.ACTIVE });
     const totalInactiveUser = User.countDocuments({ isActive: IsActive.INACTIVE });
     const totalBlockedUser = User.countDocuments({ isActive: IsActive.BLOCKED });
 
-    const lastSevenDaysUsersPromise = User.countDocuments({ createdAt: { $gte: new Date(lastSevenDays) } });
-
-    const lastThirtyDaysUsersPromise = User.countDocuments({ createdAt: { $gte: new Date(lastThirtyDays) } });
+    const lastSevenDaysUsersPromise = User.countDocuments({ createdAt: { $gte: lastSevenDays } });
+    const lastThirtyDaysUsersPromise = User.countDocuments({ createdAt: { $gte: lastThirtyDays } });
 
     const userByRolePromise = User.aggregate([
-
         {
-            $group : {
-                _id : "$role",
-                count : { $sum : 1 }
+            $group: {
+                _id: "$role",
+                count: { $sum: 1 }
             }
         }
-    ])
+    ]);
 
-    const [totalUsers, totalActive, totalInactive, totalBlocked, newUsersInLast7Days, newUsersInLast30Days , userByRole] = await Promise.all([
+    const [totalUsers, totalActive, totalInactive, totalBlocked, newUsersInLast7Days, newUsersInLast30Days, userByRole] = await Promise.all([
         totalUsersPromise,
         totalActiveUser,
         totalInactiveUser,
@@ -45,10 +47,69 @@ const getUserStats = async () => {
         newUsersInLast30Days,
         userByRole
     };
-}
+};
 
+const getAdminDashboardStats = async () => {
+    const now = new Date();
+    const lastThirtyDays = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
+    const [
+        totalUsers,
+        totalTours,
+        totalBookings,
+        completedBookings,
+        pendingBookings,
+        cancelledBookings,
+        totalRevenueResult,
+        last30DaysRevenueResult,
+        recentBookings
+    ] = await Promise.all([
+        User.countDocuments(),
+        Tour.countDocuments(),
+        Booking.countDocuments(),
+        Booking.countDocuments({ status: BOOKING_ENUM.COMPLETE }),
+        Booking.countDocuments({ status: BOOKING_ENUM.PENDING }),
+        Booking.countDocuments({ status: BOOKING_ENUM.CANCEL }),
+        Payment.aggregate([
+            { $match: { status: PAYMENT_STATUS.PAID } },
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ]),
+        Payment.aggregate([
+            {
+                $match: {
+                    status: PAYMENT_STATUS.PAID,
+                    createdAt: { $gte: lastThirtyDays }
+                }
+            },
+            { $group: { _id: null, total: { $sum: "$amount" } } }
+        ]),
+        Booking.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate("user", "name email phone picture")
+            .populate("tour", "title costFrom images location")
+            .populate("payment", "amount status transactionId")
+    ]);
+
+    const totalRevenue = totalRevenueResult[0]?.total || 0;
+    const last30DaysRevenue = last30DaysRevenueResult[0]?.total || 0;
+
+    return {
+        overview: {
+            totalUsers,
+            totalTours,
+            totalBookings,
+            completedBookings,
+            pendingBookings,
+            cancelledBookings,
+            totalRevenue,
+            last30DaysRevenue
+        },
+        recentBookings
+    };
+};
 
 export const StatsService = {
-    getUserStats
+    getUserStats,
+    getAdminDashboardStats
 };

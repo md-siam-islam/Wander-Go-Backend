@@ -12,4 +12,10 @@ router.get(
     StatsController.getUserStats
 );
 
+router.get(
+    "/dashboard",
+    checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+    StatsController.getDashboardStats
+);
+
 export const StatsRoutes = router;

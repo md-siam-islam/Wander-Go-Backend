@@ -26,6 +26,16 @@ const getUserStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         data: stats
     });
 }));
+const getDashboardStats = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const stats = yield stats_servics_1.StatsService.getAdminDashboardStats();
+    (0, sendResponse_1.Sendresponse)(res, {
+        success: true,
+        statuscode: http_status_codes_1.default.OK,
+        message: "Admin dashboard stats fetched successfully",
+        data: stats
+    });
+}));
 exports.StatsController = {
-    getUserStats
+    getUserStats,
+    getDashboardStats
 };

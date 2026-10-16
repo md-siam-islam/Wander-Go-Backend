@@ -9,12 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateUser = void 0;
+exports.validateRequest = exports.validateUser = void 0;
 const validateUser = (zodValidate) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const parsedData = yield zodValidate.parseAsync(req.body);
         req.body = parsedData;
-        console.log(req.body);
         next();
     }
     catch (error) {
@@ -22,3 +21,4 @@ const validateUser = (zodValidate) => (req, res, next) => __awaiter(void 0, void
     }
 });
 exports.validateUser = validateUser;
+exports.validateRequest = exports.validateUser;

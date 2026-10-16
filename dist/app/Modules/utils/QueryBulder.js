@@ -22,16 +22,27 @@ class QueryBuilder {
         for (const field of consts_1.deleteFields) {
             delete filter[field];
         }
+        if (this.query.minPrice || this.query.maxPrice) {
+            filter.costFrom = {};
+            if (this.query.minPrice) {
+                filter.costFrom.$gte = Number(this.query.minPrice);
+            }
+            if (this.query.maxPrice) {
+                filter.costFrom.$lte = Number(this.query.maxPrice);
+            }
+        }
         this.modelQuery = this.modelQuery.find(filter);
         return this;
     }
     // search function for  title , description , location 
     search(searchField) {
         const searchTerm = this.query.searchTerm || "";
-        const searchQuery = { $or: searchField.map(field => ({
-                [field]: { $regex: searchTerm, $options: "i" }
-            })) };
-        this.modelQuery = this.modelQuery.find(searchQuery);
+        if (searchTerm) {
+            const searchQuery = { $or: searchField.map(field => ({
+                    [field]: { $regex: searchTerm, $options: "i" }
+                })) };
+            this.modelQuery = this.modelQuery.find(searchQuery);
+        }
         return this;
     }
     sort() {
@@ -57,7 +68,7 @@ class QueryBuilder {
     }
     Getmeta() {
         return __awaiter(this, void 0, void 0, function* () {
-            const totalDocument = yield this.modelQuery.model.countDocuments();
+            const totalDocument = yield this.modelQuery.model.countDocuments(this.modelQuery.getFilter());
             const page = Number(this.query.page) || 1;
             const limit = Number(this.query.limit) || 10;
             const totalPage = Math.ceil(totalDocument / limit);

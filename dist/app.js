@@ -15,7 +15,7 @@ require("./app/config/passport"); // Ensure passport configuration is loaded
 const env_1 = require("./app/config/env");
 const app = (0, express_1.default)();
 app.use((0, express_session_1.default)({
-    secret: "your_secret_key",
+    secret: env_1.envVariables.EXPRESS_SESSION_SECRET || "wandergo_session_secret",
     resave: false,
     saveUninitialized: false
 }));

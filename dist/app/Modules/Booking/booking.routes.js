@@ -8,9 +8,11 @@ const express_1 = __importDefault(require("express"));
 const booking_controller_1 = require("./booking.controller");
 const checkAuth_1 = require("../../../MIddleware/checkAuth");
 const user_interface_1 = require("../User/user.interface");
+const booking_validation_1 = require("./booking.validation");
+const validate_user_1 = require("../../../MIddleware/validate.user");
 const router = express_1.default.Router();
 // create booking
-router.post("/", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), booking_controller_1.BookingController.CreateBooking);
+router.post("/", (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), (0, validate_user_1.validateRequest)(booking_validation_1.createBookingZodSchema), booking_controller_1.BookingController.CreateBooking);
 // get all booking 
 router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN, user_interface_1.Role.SUPER_ADMIN), booking_controller_1.BookingController.getAllbooking);
 // get my booking 

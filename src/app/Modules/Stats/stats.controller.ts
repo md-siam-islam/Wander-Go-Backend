@@ -17,6 +17,19 @@ const getUserStats = catchAsync(async (req:Request , res: Response , next: NextF
     })
 });
 
+const getDashboardStats = catchAsync(async (req:Request , res: Response , next: NextFunction) => {
+
+    const stats = await StatsService.getAdminDashboardStats();
+
+    Sendresponse(res,{
+        success : true,
+        statuscode : httpStatus.OK,
+        message : "Admin dashboard stats fetched successfully",
+        data : stats
+    })
+});
+
 export const StatsController = {
-    getUserStats
+    getUserStats,
+    getDashboardStats
 };

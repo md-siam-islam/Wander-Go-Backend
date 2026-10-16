@@ -22,12 +22,17 @@ const initPayment = catchAsync(async (req:Request , res:Response, next:NextFunct
 
 const successPayment = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const query = req.query
+    const query = req.query as Record<string, string>;
+    const body = req.body;
 
-    const result = await PaymentServices.successPayment(query as Record<string ,string >)
+    const result = await PaymentServices.successPayment(query, body)
+
+    const transactionId = query.transactionId || body?.tran_id || "";
+    const amount = query.amount || body?.amount || "";
+    const status = query.status || body?.status || "success";
 
     if(result.success){
-        res.redirect(`${envVariables.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`)
+        res.redirect(`${envVariables.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`)
     }
    
 })
@@ -35,22 +40,32 @@ const successPayment = catchAsync(async (req:Request , res:Response, next:NextFu
 
 const faildPayment = catchAsync (async (req:Request , res:Response, next:NextFunction) => {
 
-    const query = req.query 
+    const query = req.query as Record<string, string>;
+    const body = req.body;
 
-    const result = await PaymentServices.failedPayment(query as Record<string, string>)
+    const result = await PaymentServices.failedPayment(query, body)
+
+    const transactionId = query.transactionId || body?.tran_id || "";
+    const amount = query.amount || body?.amount || "";
+    const status = query.status || body?.status || "fail";
 
     if(!result.success){
-        res.redirect(`${envVariables.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`)
+        res.redirect(`${envVariables.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`)
     }
 })
 const cancelPayment = catchAsync (async (req:Request , res:Response, next:NextFunction) => {
 
-    const query = req.query 
+    const query = req.query as Record<string, string>;
+    const body = req.body;
 
-    const result = await PaymentServices.cancelPayment(query as Record<string, string>)
+    const result = await PaymentServices.cancelPayment(query, body)
+
+    const transactionId = query.transactionId || body?.tran_id || "";
+    const amount = query.amount || body?.amount || "";
+    const status = query.status || body?.status || "cancel";
 
     if(!result.success){
-        res.redirect(`${envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${query.transactionId}&amount=${query.amount}&status=${query.status}`)
+        res.redirect(`${envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`)
     }
 })
 

@@ -11,16 +11,16 @@ import { validateTour } from '../../../MIddleware/tourValidatio';
 const router = express.Router()
 
 //  tour type routes
-router.post("/create-tour-type" , TourController.TourtypeCreate)
+router.post("/create-tour-type" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.TourtypeCreate)
 router.get("/tour-types" , TourController.getAllTourtype)
 router.get("/tour-types/:id" , TourController.GetSingleTourtype)
-router.patch("/tour-types/:id" , TourController.UpdateTourtype)
-router.delete("/tour-types/:id" , TourController.DeleteTourtype)
+router.patch("/tour-types/:id" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.UpdateTourtype)
+router.delete("/tour-types/:id" , checkAuth(Role.ADMIN, Role.SUPER_ADMIN), TourController.DeleteTourtype)
 
 // tour routes
 
 router.post("/create" ,
-    // checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
+    checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
     multerUpload.array("files"),
     validateTour(tourValidationSchema),
     TourController.TourCreate
@@ -30,7 +30,7 @@ router.get("/", TourController.getAlltour)
 router.get("/:id" , TourController.GetSingleTour)
 
 router.patch("/:id" ,
-    // checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
+    checkAuth(Role.ADMIN , Role.SUPER_ADMIN),
     multerUpload.array("files"),
     validateTour(updateTourValidationSchema), 
     TourController.UpdateTour)

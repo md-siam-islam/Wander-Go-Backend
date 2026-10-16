@@ -5,9 +5,11 @@ export const validateUser = (zodValidate: AnyZodObject) => async (req: Request, 
     try {
       const parsedData = await zodValidate.parseAsync(req.body);
       req.body = parsedData;
-      console.log(req.body);
       next();
     } catch (error) {
       next(error);
     }
   };
+
+export const validateRequest = validateUser;
+

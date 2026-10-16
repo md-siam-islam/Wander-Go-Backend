@@ -48,27 +48,37 @@ passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientSecret: env_1.envVariables.GOOGLE_CLIENT_SECRET,
     callbackURL: env_1.envVariables.GOOGLE_CALLBACK_URI
 }, (accessToken, refreshToken, profile, Done) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c, _d;
     try {
-        const email = (_a = profile.emails) === null || _a === void 0 ? void 0 : _a[0].value;
+        const email = (_b = (_a = profile.emails) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.value;
         if (!email) {
             return Done(null, false, { message: "Email not found in Google profile" });
         }
-        const user = yield user_model_1.User.findOne({ email });
+        let user = yield user_model_1.User.findOne({ email });
         if (!user) {
-            const user = yield user_model_1.User.create({
+            user = yield user_model_1.User.create({
                 email,
-                name: profile.displayName,
-                photo: (_b = profile.photos) === null || _b === void 0 ? void 0 : _b[0].value,
+                name: profile.displayName || "Google User",
+                picture: (_d = (_c = profile.photos) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.value,
                 role: user_interface_1.Role.USER,
                 auth: [{
-                        Provider: "google",
+                        Provider: "Google",
                         ProviderId: profile.id
                     }],
                 isVerified: true,
             });
             return Done(null, user);
         }
+        // If user exists, link Google provider if not already linked
+        const hasGoogleAuth = user.auth.some(p => { var _a; return ((_a = p.Provider) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === "google"; });
+        if (!hasGoogleAuth) {
+            user.auth.push({
+                Provider: "Google",
+                ProviderId: profile.id
+            });
+            yield user.save();
+        }
+        return Done(null, user);
     }
     catch (error) {
         console.error("Error during Google OAuth:", error);

@@ -35,10 +35,12 @@ export const updateTourValidationSchema = z.object({
     excluded: z.array(z.string()).optional(),
     amenities: z.array(z.string()).optional(),
     tourPlan: z.array(z.string()).optional(),
+    maxGuests: z.number().optional(),
     maxGuest: z.number().optional(),
     minAge: z.number().optional(),
     departureLocation: z.string().optional(),
     arrivalLocation: z.string().optional(),
     images: z.array(z.string()).default([]).optional(),
+    deletedImages: z.array(z.string()).optional(),
     deleteImages: z.array(z.string()).optional()
 });

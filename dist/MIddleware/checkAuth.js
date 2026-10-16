@@ -16,7 +16,7 @@ const user_model_1 = require("../app/Modules/User/user.model");
 const user_interface_1 = require("../app/Modules/User/user.interface");
 const checkAuth = (...role) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const authHeader = req.headers.authorization;
+        const authHeader = req.headers.authorization || req.cookies.accessToken;
         if (!authHeader) {
             throw new Error("No token provided from checkAuth");
         }
