@@ -64,3 +64,4 @@ process.on("uncaughtException", (error) => {
     }
     process.exit(1);
 });
+exports.default = app_1.default;
