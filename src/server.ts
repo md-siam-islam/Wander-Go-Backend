@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import app from "./app";
 import { seedSuperAdmin } from "./app/Modules/utils/seedSuperAdmin";
 import { envVariables } from "./app/config/env";
-import { connectRedis } from "./app/config/redis.config";
 
 let server : Server ;
 const PORT = envVariables.PORT || 5000;
@@ -25,12 +24,6 @@ async function StartServer() {
 
 (async () => {
     await StartServer();
-
-    try {
-        await connectRedis();
-    } catch (error) {
-        console.warn("⚠️ Redis init skipped:", error);
-    }
 
     try {
         await seedSuperAdmin();

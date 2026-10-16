@@ -14,18 +14,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OtpService = void 0;
 const crypto_1 = __importDefault(require("crypto"));
-const redis_config_1 = require("../../config/redis.config");
+const otp_model_1 = require("./otp.model");
 const emailSener_1 = require("../utils/emailSener");
 const user_model_1 = require("../User/user.model");
 const userAccessToken_1 = require("../utils/userAccessToken");
-const OTP_EXPIRY_TIME = 2 * 60; // 2 minutes in seconds
 const generateOTP = (length = 6) => {
-    const otp = crypto_1.default.randomInt(10 ** (length - 1), 10 ** length).toString();
-    return otp;
+    return crypto_1.default.randomInt(10 ** (length - 1), 10 ** length).toString();
 };
 const sendOTP = (email) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email });
-    const name = user === null || user === void 0 ? void 0 : user.name;
     if (!user) {
         throw new Error('User not found');
     }
@@ -33,19 +30,15 @@ const sendOTP = (email) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error('User is already verified');
     }
     const otp = generateOTP();
-    const radisKey = `otp:${email}`;
-    yield redis_config_1.redisClient.set(radisKey, otp, {
-        expiration: {
-            type: 'EX',
-            value: OTP_EXPIRY_TIME
-        }
-    });
+    // Store in MongoDB with auto TTL (2 minutes)
+    yield otp_model_1.Otp.deleteMany({ email });
+    yield otp_model_1.Otp.create({ email, otp });
     yield (0, emailSener_1.sendMailer)({
         to: email,
         subject: 'Your OTP Code',
         templateName: "otp",
         templateData: {
-            name: name,
+            name: user.name,
             otp: otp,
         }
     });
@@ -58,14 +51,13 @@ const verifyOTP = (email, otp) => __awaiter(void 0, void 0, void 0, function* ()
     if (user.isVerified) {
         throw new Error('User is already verified');
     }
-    const radisKey = `otp:${email}`;
-    const storedOtp = yield redis_config_1.redisClient.get(radisKey);
-    if (storedOtp !== otp) {
-        throw new Error('Invalid OTP');
+    const storedOtpRecord = yield otp_model_1.Otp.findOne({ email, otp });
+    if (!storedOtpRecord) {
+        throw new Error('Invalid or expired OTP');
     }
     yield Promise.all([
         user_model_1.User.updateOne({ email }, { isVerified: true }, { runValidators: true }),
-        redis_config_1.redisClient.del([radisKey])
+        otp_model_1.Otp.deleteMany({ email })
     ]);
     const tokenInfo = (0, userAccessToken_1.JwtAccessToken)(user);
     return tokenInfo;

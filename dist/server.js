@@ -16,16 +16,18 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 const seedSuperAdmin_1 = require("./app/Modules/utils/seedSuperAdmin");
 const env_1 = require("./app/config/env");
-const redis_config_1 = require("./app/config/redis.config");
 let server;
 const PORT = env_1.envVariables.PORT || 5000;
 function StartServer() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(env_1.envVariables.DB_URL);
-            server = app_1.default.listen(PORT, () => {
-                console.log(`🚀 Server running on port ${PORT}`);
-            });
+            console.log("✅ Connected to MongoDB successfully");
+            if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
+                server = app_1.default.listen(PORT, () => {
+                    console.log(`🚀 Server running on port ${PORT}`);
+                });
+            }
         }
         catch (error) {
             console.error("❌ Failed to connect to database:", error);
@@ -33,9 +35,13 @@ function StartServer() {
     });
 }
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    yield (0, redis_config_1.connectRedis)();
     yield StartServer();
-    yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+    try {
+        yield (0, seedSuperAdmin_1.seedSuperAdmin)();
+    }
+    catch (error) {
+        console.warn("⚠️ Super Admin seed warning:", error);
+    }
 }))();
 process.on("SIGTERM", () => {
     console.log("Server shut down");
