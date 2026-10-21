@@ -47,8 +47,7 @@ const initPayment = async (bookingId: string) => {
     const paymentUrl = sslPaymentGetway?.GatewayPageURL || sslPaymentGetway?.redirectGatewayURL;
 
     if (!paymentUrl) {
-        const rawDetails = typeof sslPaymentGetway === "object" ? JSON.stringify(sslPaymentGetway) : String(sslPaymentGetway);
-        const errorReason = sslPaymentGetway?.failedreason || sslPaymentGetway?.message || sslPaymentGetway?.status || rawDetails;
+        const errorReason = sslPaymentGetway?.failedreason || sslPaymentGetway?.message || sslPaymentGetway?.status || "Payment gateway URL generation failed";
         throw new Error(`SSLCommerz payment gateway error: ${errorReason}`);
     }
 

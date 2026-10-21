@@ -4,9 +4,14 @@ import axios from 'axios';
 
 const sslPayment = async (payload: SSLcommrez) => {
 
-    const storeId = envVariables.SSL.SSL_STORE_ID ? envVariables.SSL.SSL_STORE_ID.trim() : "";
-    const storePass = envVariables.SSL.SSL_STORE_PASS ? envVariables.SSL.SSL_STORE_PASS.trim() : "";
-    const paymentApi = envVariables.SSL.SSL_PAYMENT_API ? envVariables.SSL.SSL_PAYMENT_API.trim() : "https://sandbox.sslcommerz.com/gwprocess/v4/api.php";
+    const storeId = envVariables.SSL.SSL_STORE_ID ? envVariables.SSL.SSL_STORE_ID.trim() : "testbox";
+    const storePass = envVariables.SSL.SSL_STORE_PASS ? envVariables.SSL.SSL_STORE_PASS.trim() : "testbox@ssl";
+    
+    // Always enforce v4 endpoint even if env variable in Vercel still has outdated v3 URL
+    let paymentApi = envVariables.SSL.SSL_PAYMENT_API ? envVariables.SSL.SSL_PAYMENT_API.trim() : "https://sandbox.sslcommerz.com/gwprocess/v4/api.php";
+    if (paymentApi.includes("/v3/")) {
+        paymentApi = paymentApi.replace("/v3/", "/v4/");
+    }
 
     const data = {
         store_id: storeId,
