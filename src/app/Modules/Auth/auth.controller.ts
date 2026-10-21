@@ -5,7 +5,7 @@ import { catchAsync } from "../utils/catchAsync"
 import { AuthServices } from "./auth.services"
 import { Sendresponse } from "../utils/sendResponse"
 import httpStatus from "http-status-codes"
-import { setCookiesAccessTokenwithRefreshToken } from "../utils/setCookies"
+import { setCookiesAccessTokenwithRefreshToken, clearAuthCookies } from "../utils/setCookies"
 import { createToken } from '../utils/jwt';
 import { envVariables } from '../../config/env';
 import { JwtAccessToken } from '../utils/userAccessToken';
@@ -81,16 +81,7 @@ const RefreshToken = catchAsync(async (req: Request, res: Response, next: NextFu
 
 const LogoutUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    res.clearCookie("accessToken", {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax"
-    });
-    res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax"
-    });
+    clearAuthCookies(res);
 
     Sendresponse(res, {
         success: true,
