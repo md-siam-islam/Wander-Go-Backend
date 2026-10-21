@@ -7,7 +7,7 @@ import { Sendresponse } from "../utils/sendResponse";
 
 const initPayment = catchAsync(async (req:Request , res:Response, next:NextFunction) => {
 
-    const bookingId = req.params.bookingId
+    const bookingId = req.params.bookingId || req.body.bookingId
 
     const result = await PaymentServices.initPayment(bookingId as string)
 

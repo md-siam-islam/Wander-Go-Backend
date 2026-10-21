@@ -1,3 +1,5 @@
+import { User } from "../User/user.model";
+import mongoose from "mongoose";
 import { BOOKING_ENUM } from "../Booking/booking.interface"
 import { Booking } from "../Booking/booking.model"
 import { SSLservices } from "../sslCommerz/ssl.services"
@@ -6,37 +8,53 @@ import { PAYMENT_STATUS } from "./payment.interface"
 import { Payment } from "./payment.model"
 
 
-const initPayment = async (bookingId : string) => {
-
-    const payment = await Payment.findOne({booking : bookingId})
-
-    if(!payment){
-        throw new Error ("Booking not found , place again make booking for tour")
+const initPayment = async (bookingId: string) => {
+    if (!bookingId) {
+        throw new Error("Booking ID is required");
     }
 
-    const booking = await Booking.findById(payment.booking)
-.populate("user")
+    let payment = await Payment.findOne({ booking: bookingId });
+    if (!payment && mongoose.Types.ObjectId.isValid(bookingId)) {
+        payment = await Payment.findById(bookingId);
+    }
 
-        const Name = (booking?.user as any).name
-        const Email = (booking?.user as any).email
-        const Phone = (booking?.user as any).phone
-        const Addres = (booking?.user as any).address
-    
-        const sslArgument: SSLcommrez = {
-            amount : payment.amount,
-            transactionId : payment.transactionId,
-            name : Name, 
-            email: Email,
-            phone : Phone,
-            address: Addres
-        }
-    
-        const sslPaymentGetway = await SSLservices.sslPayment(sslArgument)
+    if (!payment) {
+        throw new Error("Booking payment record not found. Please create a new booking.");
+    }
 
-        return {
-             paymentUrl : sslPaymentGetway.GatewayPageURL
-        }
+    const booking = await Booking.findById(payment.booking).populate("user");
+    if (!booking) {
+        throw new Error("Associated booking not found.");
+    }
 
+    const userObj = booking.user as any;
+    const Name = userObj?.name || "Customer";
+    const Email = userObj?.email || "customer@wandergo.com";
+    const Phone = userObj?.phone || "01700000000";
+    const Addres = userObj?.address || "Dhaka, Bangladesh";
+
+    const sslArgument: SSLcommrez = {
+        amount: payment.amount,
+        transactionId: payment.transactionId,
+        name: Name,
+        email: Email,
+        phone: Phone,
+        address: Addres
+    };
+
+    const sslPaymentGetway = await SSLservices.sslPayment(sslArgument);
+
+    const paymentUrl = sslPaymentGetway?.GatewayPageURL || sslPaymentGetway?.redirectGatewayURL;
+
+    if (!paymentUrl) {
+        const errorReason = sslPaymentGetway?.failedreason || sslPaymentGetway?.message || sslPaymentGetway?.status || "Payment gateway failed to generate URL";
+        throw new Error(`SSLCommerz payment gateway error: ${errorReason}`);
+    }
+
+    return {
+        paymentUrl,
+        sslStatus: sslPaymentGetway?.status
+    };
 }
 const successPayment = async (query : Record<string, string>, body?: any) => {
 
