@@ -13,15 +13,37 @@ const sslPayment = async (payload: SSLcommrez) => {
         paymentApi = paymentApi.replace("/v3/", "/v4/");
     }
 
+    // Backend callback endpoints
+    // If running in production or on Vercel, OR if the configured URL mistakenly points to localhost:5000:
+    // SSLCommerz MUST redirect to the live Vercel backend so it can verify the payment and update MongoDB!
+    const liveBackendApi = "https://backend-wander-go-tour-management.vercel.app/api/v1/payment";
+
+    let backendSuccessUrl = (envVariables.SSL.SSL_SUCCESS_BACKEND_URL || "").trim();
+    let backendFailUrl = (envVariables.SSL.SSL_FAIL_BACKEND_URL || "").trim();
+    let backendCancelUrl = (envVariables.SSL.SSL_CANCEL_BACKEND_URL || "").trim();
+
+    const isRunningOnVercel = !!process.env.VERCEL;
+    const isProd = process.env.NODE_ENV === "production";
+
+    if (isRunningOnVercel || isProd || !backendSuccessUrl || backendSuccessUrl.includes("localhost:5000")) {
+        backendSuccessUrl = `${liveBackendApi}/success`;
+    }
+    if (isRunningOnVercel || isProd || !backendFailUrl || backendFailUrl.includes("localhost:5000")) {
+        backendFailUrl = `${liveBackendApi}/fail`;
+    }
+    if (isRunningOnVercel || isProd || !backendCancelUrl || backendCancelUrl.includes("localhost:5000")) {
+        backendCancelUrl = `${liveBackendApi}/cancel`;
+    }
+
     const data = {
         store_id: storeId,
         store_passwd: storePass,
         total_amount: payload.amount,
         currency: "BDT",
         tran_id: payload.transactionId,
-        success_url : `${envVariables.SSL.SSL_SUCCESS_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
-        fail_url : `${envVariables.SSL.SSL_FAIL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
-        cancel_url: `${envVariables.SSL.SSL_CANCEL_BACKEND_URL}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancle`,
+        success_url : `${backendSuccessUrl}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=success`,
+        fail_url : `${backendFailUrl}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=fail`,
+        cancel_url: `${backendCancelUrl}?transactionId=${payload.transactionId}&amount=${payload.amount}&status=cancel`,
         shipping_method : "NO",
         num_of_item : 1,
         weight_of_items : 0,

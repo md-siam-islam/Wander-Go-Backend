@@ -19,47 +19,70 @@ const payment_services_1 = require("./payment.services");
 const env_1 = require("../../config/env");
 const sendResponse_1 = require("../utils/sendResponse");
 const initPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const bookingId = req.params.bookingId;
+    const bookingId = req.params.bookingId || req.body.bookingId;
     const result = yield payment_services_1.PaymentServices.initPayment(bookingId);
     (0, sendResponse_1.Sendresponse)(res, {
         success: true,
         statuscode: http_status_codes_1.default.OK,
-        message: "Booking payment Successfully",
+        message: "Booking payment initialized successfully",
         data: result
     });
 }));
 const successPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const body = req.body;
-    const result = yield payment_services_1.PaymentServices.successPayment(query, body);
+    const body = req.body || {};
     const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
     const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
     const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "success";
-    if (result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_SUCCESS_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
+    let frontendSuccessUrl = (env_1.envVariables.SSL.SSL_SUCCESS_FRONTEND_URL || "http://localhost:5173/payment/success").trim();
+    let frontendFailUrl = (env_1.envVariables.SSL.SSL_FAIL_FRONTEND_URL || "http://localhost:5173/payment/fail").trim();
+    if (frontendSuccessUrl.includes(":3000"))
+        frontendSuccessUrl = frontendSuccessUrl.replace(":3000", ":5173");
+    if (frontendFailUrl.includes(":3000"))
+        frontendFailUrl = frontendFailUrl.replace(":3000", ":5173");
+    try {
+        const result = yield payment_services_1.PaymentServices.successPayment(query, body);
+        return res.redirect(`${frontendSuccessUrl}?transactionId=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount)}&status=success`);
+    }
+    catch (err) {
+        console.error("Payment success processing error:", (err === null || err === void 0 ? void 0 : err.message) || err);
+        return res.redirect(`${frontendFailUrl}?transactionId=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount)}&status=fail&error=${encodeURIComponent((err === null || err === void 0 ? void 0 : err.message) || "Payment verification failed")}`);
     }
 }));
 const faildPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const body = req.body;
-    const result = yield payment_services_1.PaymentServices.failedPayment(query, body);
+    const body = req.body || {};
     const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
     const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
     const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "fail";
-    if (!result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_FAIL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
+    const errorMsg = (body === null || body === void 0 ? void 0 : body.error) || (body === null || body === void 0 ? void 0 : body.failedreason) || (query === null || query === void 0 ? void 0 : query.error) || "Payment was declined by payment gateway or bank.";
+    try {
+        yield payment_services_1.PaymentServices.failedPayment(query, body);
     }
+    catch (err) {
+        console.error("Payment failed recording error:", (err === null || err === void 0 ? void 0 : err.message) || err);
+    }
+    let frontendFailUrl = (env_1.envVariables.SSL.SSL_FAIL_FRONTEND_URL || "http://localhost:5173/payment/fail").trim();
+    if (frontendFailUrl.includes(":3000"))
+        frontendFailUrl = frontendFailUrl.replace(":3000", ":5173");
+    return res.redirect(`${frontendFailUrl}?transactionId=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount)}&status=fail&error=${encodeURIComponent(errorMsg)}`);
 }));
 const cancelPayment = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const query = req.query;
-    const body = req.body;
-    const result = yield payment_services_1.PaymentServices.cancelPayment(query, body);
+    const body = req.body || {};
     const transactionId = query.transactionId || (body === null || body === void 0 ? void 0 : body.tran_id) || "";
     const amount = query.amount || (body === null || body === void 0 ? void 0 : body.amount) || "";
     const status = query.status || (body === null || body === void 0 ? void 0 : body.status) || "cancel";
-    if (!result.success) {
-        res.redirect(`${env_1.envVariables.SSL.SSL_CANCEL_FRONTEND_URL}?transactionId=${transactionId}&amount=${amount}&status=${status}`);
+    try {
+        yield payment_services_1.PaymentServices.cancelPayment(query, body);
     }
+    catch (err) {
+        console.error("Payment cancel recording error:", (err === null || err === void 0 ? void 0 : err.message) || err);
+    }
+    let frontendCancelUrl = (env_1.envVariables.SSL.SSL_CANCEL_FRONTEND_URL || "http://localhost:5173/payment/cancel").trim();
+    if (frontendCancelUrl.includes(":3000"))
+        frontendCancelUrl = frontendCancelUrl.replace(":3000", ":5173");
+    return res.redirect(`${frontendCancelUrl}?transactionId=${encodeURIComponent(transactionId)}&amount=${encodeURIComponent(amount)}&status=cancel`);
 }));
 const getAllPayments = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield payment_services_1.PaymentServices.getAllPayments(req.query);

@@ -56,127 +56,121 @@ const initPayment = async (bookingId: string) => {
         sslStatus: sslPaymentGetway?.status
     };
 }
-const successPayment = async (query : Record<string, string>, body?: any) => {
+const successPayment = async (query: Record<string, string>, body?: any) => {
+    const transactionId = query.transactionId || body?.tran_id;
+    if (!transactionId) {
+        throw new Error("Transaction ID is missing");
+    }
 
-    const session = await Booking.startSession()
-    session.startTransaction()
-
+    // Try transactional update if replica set is available
     try {
-        const transactionId = query.transactionId || body?.tran_id;
-        if (!transactionId) {
-            throw new Error("Transaction ID is missing");
-        }
-        
-        const Updatedpayment = await Payment.findOneAndUpdate(
-            { transactionId },
-            { 
-                status : PAYMENT_STATUS.PAID,
-                paymentGatewayData: body || query
-            },
-            { session, new: true }
-        )
+        const session = await Booking.startSession();
+        session.startTransaction();
+        try {
+            const Updatedpayment = await Payment.findOneAndUpdate(
+                { transactionId },
+                { 
+                    status: PAYMENT_STATUS.PAID,
+                    paymentGatewayData: body || query
+                },
+                { session, new: true }
+            );
 
-        if (!Updatedpayment) {
-            throw new Error("Payment record not found for transaction: " + transactionId);
-        }
+            if (Updatedpayment) {
+                await Booking.findByIdAndUpdate(
+                    Updatedpayment.booking,
+                    { status: BOOKING_ENUM.COMPLETE },
+                    { new: true, runValidators: true, session }
+                );
+            }
 
+            await session.commitTransaction();
+            session.endSession();
+            return { success: true, message: "Payment successful" };
+        } catch (txErr: any) {
+            await session.abortTransaction();
+            session.endSession();
+            // If error is not replica set error, rethrow
+            if (!txErr?.message?.includes("replica set")) {
+                throw txErr;
+            }
+        }
+    } catch (sessionErr: any) {
+        // Fall back to direct atomic updates for standalone MongoDB
+    }
+
+    // Direct atomic update
+    const Updatedpayment = await Payment.findOneAndUpdate(
+        { transactionId },
+        { 
+            status: PAYMENT_STATUS.PAID,
+            paymentGatewayData: body || query
+        },
+        { new: true }
+    );
+
+    if (!Updatedpayment) {
+        throw new Error("Payment record not found for transaction: " + transactionId);
+    }
+
+    await Booking.findByIdAndUpdate(
+        Updatedpayment.booking,
+        { status: BOOKING_ENUM.COMPLETE },
+        { new: true, runValidators: true }
+    );
+
+    return { success: true, message: "Payment successful" };
+};
+
+const failedPayment = async (query: Record<string, string>, body?: any) => {
+    const transactionId = query.transactionId || body?.tran_id;
+    if (!transactionId) return { success: false, message: "No transaction ID" };
+
+    const Updatedpayment = await Payment.findOneAndUpdate(
+        { transactionId },
+        { 
+            status: PAYMENT_STATUS.FAILED,
+            paymentGatewayData: body || query
+        },
+        { new: true }
+    );
+
+    if (Updatedpayment) {
         await Booking.findByIdAndUpdate(
             Updatedpayment.booking,
-            { status: BOOKING_ENUM.COMPLETE },
-            { new : true , runValidators : true, session }
-        ).populate("user" , "name email phone address").populate("tour" , "title costFrom").populate("payment")
-            
-        await session.commitTransaction()
-        session.endSession()
-
-        return {
-            success : true , message : "Payment successful"
-        }
-
-    } catch (error) {
-        await session.abortTransaction()
-        session.endSession()
-        throw error
+            { status: BOOKING_ENUM.FAILED },
+            { runValidators: true }
+        );
     }
 
-}
+    return { success: false, message: "Payment failed" };
+};
 
-const failedPayment = async (query : Record<string, string>, body?: any) =>{
+const cancelPayment = async (query: Record<string, string>, body?: any) => {
+    const transactionId = query.transactionId || body?.tran_id;
+    if (!transactionId) return { success: false, message: "No transaction ID" };
 
-    const session = await Booking.startSession()
-    session.startTransaction()
+    const Updatedpayment = await Payment.findOneAndUpdate(
+        { transactionId },
+        { 
+            status: PAYMENT_STATUS.CANCEL,
+            paymentGatewayData: body || query
+        },
+        { new: true }
+    );
 
-    try {
-        const transactionId = query.transactionId || body?.tran_id;
-        
-        const Updatedpayment = await Payment.findOneAndUpdate(
-            { transactionId },
-            { 
-                status : PAYMENT_STATUS.FAILED,
-                paymentGatewayData: body || query
-            },
-            { session, new: true }
-        )
-
-        if (Updatedpayment) {
-            await Booking.findByIdAndUpdate(
-                Updatedpayment.booking,
-                { status: BOOKING_ENUM.FAILED },
-                { runValidators : true, session }
-            )
-        }
-            
-        await session.commitTransaction()
-        session.endSession()
-
-        return {
-            success : false , message : "Payment failed"
-        }
-
-    } catch (error) {
-        await session.abortTransaction()
-        session.endSession()
-        throw error
+    if (Updatedpayment) {
+        await Booking.findByIdAndUpdate(
+            Updatedpayment.booking,
+            { status: BOOKING_ENUM.CANCEL },
+            { runValidators: true }
+        );
     }
-}
-const cancelPayment = async (query : Record<string, string>, body?: any) =>{
 
-    const session = await Booking.startSession()
-    session.startTransaction()
+    return { success: false, message: "Payment cancelled" };
+};
 
-    try {
-        const transactionId = query.transactionId || body?.tran_id;
-        
-        const Updatedpayment = await Payment.findOneAndUpdate(
-            { transactionId },
-            { 
-                status : PAYMENT_STATUS.CANCEL,
-                paymentGatewayData: body || query
-            },
-            { session, new: true }
-        )
 
-        if (Updatedpayment) {
-            await Booking.findByIdAndUpdate(
-                Updatedpayment.booking,
-                { status: BOOKING_ENUM.CANCEL },
-                { runValidators : true, session }
-            )
-        }
-            
-        await session.commitTransaction()
-        session.endSession()
-
-        return {
-            success : false , message : "Payment cancelled"
-        }
-
-    } catch (error) {
-        await session.abortTransaction()
-        session.endSession()
-        throw error
-    }
-}
 import { QueryBuilder } from "../utils/QueryBulder";
 
 const getAllPayments = async (query: Record<string, string>) => {

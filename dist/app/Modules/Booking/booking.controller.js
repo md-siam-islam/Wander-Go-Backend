@@ -26,7 +26,8 @@ const CreateBooking = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter
         message: "Booking Created Successfully",
         data: {
             bookingDetails: Booking.BookingDetails,
-            paymentUrl: Booking.paymentUrl || "Payment URL not found"
+            paymentUrl: Booking.paymentUrl || "Payment URL not found",
+            sslFailedReason: Booking.sslFailedReason || undefined
         }
     });
 }));
