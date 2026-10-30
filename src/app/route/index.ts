@@ -12,6 +12,7 @@ import { StatsRoutes } from '../Modules/Stats/stats.route';
 import { ReviewRoutes } from '../Modules/Review/review.route';
 import { WishlistRoutes } from '../Modules/Wishlist/wishlist.route';
 import { CouponRoutes } from '../Modules/Coupon/coupon.route';
+import { GuideApplicationRoutes } from '../Modules/GuideApplication/guideApplication.route';
 
 
 export const router = express.Router()
